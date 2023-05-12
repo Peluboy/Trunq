@@ -5,16 +5,16 @@ import "../styles/account.css";
 const Navbar = () => {
   return (
     <>
-      <AppBar position="static">
+      <AppBar position="static" color="secondary" elevation={0}>
         <Toolbar>
           <img src={TrunqLogo} alt="" className="trunq-logo" />
           <Box ml="auto" display="flex">
             <Box mr="1rem">
-              <Button color="inherit" variant="outlined">
+              <Button disableElevation color="primary" variant="outlined">
                 Source Code
               </Button>
             </Box>
-            <Button color="inherit" variant="contained">
+            <Button disableElevation color="primary" variant="contained">
               Log Out
             </Button>
           </Box>

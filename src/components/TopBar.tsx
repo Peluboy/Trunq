@@ -1,5 +1,4 @@
 import React from "react";
-
 import { useState } from "react";
 import "../styles/account.css";
 import { Box, Tabs, Tab, Typography, Grid, Button } from "@mui/material";
@@ -8,6 +7,25 @@ import { BsQrCodeScan } from "react-icons/bs";
 import { AiOutlinePlus } from "react-icons/ai";
 import LinkCard from "./LinkCard";
 
+export interface LinkCardProps {
+  id: string;
+  createdAt: Date;
+  name: string;
+  longURL: string;
+  shortCode: string;
+  totalClicks: number;
+}
+
+const dummyData = [
+  {
+    id: "03f5gy55k",
+    createdAt: new Date(),
+    name: "My website",
+    longURL: "https://example.com/longURL/998gthds?./:hn",
+    shortCode: "trunq",
+    totalClicks: 100,
+  },
+];
 interface TabPanelProps {
   children?: React.ReactNode;
   index: number;
@@ -42,6 +60,11 @@ function a11yProps(index: number) {
 }
 
 const TopBar = () => {
+  const [link, setLink] = useState({
+    name: "",
+    url: "",
+  });
+
   const [value, setValue] = useState(0);
 
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
@@ -55,6 +78,7 @@ const TopBar = () => {
             sx={{ borderBottom: 1, borderColor: "divider" }}
             display="flex"
             justifyContent="space-between"
+            alignItems="center"
           >
             <Tabs
               value={value}
@@ -94,7 +118,11 @@ const TopBar = () => {
             </button>
           </Box>
           <TabPanel value={value} index={0}>
-            <LinkCard />
+            <>
+              {dummyData.map((link) => (
+                <LinkCard key={link.id} {...link} />
+              ))}
+            </>
           </TabPanel>
           <TabPanel value={value} index={1}>
             Generate QR Code

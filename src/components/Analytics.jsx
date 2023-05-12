@@ -14,7 +14,9 @@ const Analytics = () => {
       <Grid item xs={8}>
         <Box mt="3rem">
           <Box mb="1.5rem">
-            <Typography variant="body1">STATS</Typography>
+            <Typography variant="body2" color="success">
+              STATS
+            </Typography>
           </Box>
           <Box display="flex" justifyContent="space-between">
             <Box display="flex" flexDirection="column">
