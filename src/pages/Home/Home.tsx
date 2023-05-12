@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { TextField, Typography, Button } from "@mui/material";
+import { auth } from "../../utils/Firebase";
+import { createUserWithEmailAndPassword } from "firebase/auth";
 
 const Home = () => {
   const [form, setForm] = useState({
@@ -13,6 +15,25 @@ const Home = () => {
       [event.target.name]: event.target.value,
     }));
 
+  const handleSignup = async () => {
+    try {
+      await createUserWithEmailAndPassword(auth, form.email, form.password);
+    } catch (error: any) {
+      if (error.code === "auth/email-already-in-use") {
+        console.log("Email already in use");
+        // show error message to the user
+      } else if (error.code === "auth/invalid-email") {
+        console.log("Invalid email");
+        // show error message to the user
+      } else {
+        console.log(error.message);
+        // show error message to the user
+      }
+    }
+  };
+
+  // console.log(auth.currentUser);
+
   return (
     <>
       <Typography>Home Page</Typography>
@@ -25,6 +46,7 @@ const Home = () => {
         Email
       </TextField>
       <TextField
+        type="password"
         value={form.password}
         name="password"
         onChange={handleChange}
@@ -32,7 +54,7 @@ const Home = () => {
       >
         Password
       </TextField>
-      <Button onClick={() => console.log(form)}>Sign In</Button>
+      <Button onClick={handleSignup}>Sign Up</Button>
     </>
   );
 };

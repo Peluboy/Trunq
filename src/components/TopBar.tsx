@@ -6,6 +6,7 @@ import { BiHome } from "react-icons/bi";
 import { BsQrCodeScan } from "react-icons/bs";
 import { AiOutlinePlus } from "react-icons/ai";
 import LinkCard from "./LinkCard";
+import ShortenURLModal from "./ShortenURLModel";
 
 export interface LinkCardProps {
   id: string;
@@ -69,10 +70,9 @@ function a11yProps(index: number) {
 }
 
 const TopBar = () => {
-  const [link, setLink] = useState({
-    name: "",
-    url: "",
-  });
+  const [links, setLinks] = useState(dummyData);
+
+  const [openModal, setOpenModal] = useState(false);
 
   const [value, setValue] = useState(0);
 
@@ -81,6 +81,12 @@ const TopBar = () => {
   };
   return (
     <>
+      {openModal && (
+        <ShortenURLModal
+          open={openModal}
+          handleClose={() => setOpenModal(false)}
+        />
+      )}
       <Grid container justifyContent="center">
         <Grid item xs={8}>
           <Box
@@ -117,18 +123,22 @@ const TopBar = () => {
                 {...a11yProps(1)}
               />
             </Tabs>
-            <button className="custom-button">
+            <Button
+              variant="contained"
+              disableElevation
+              onClick={() => setOpenModal(true)}
+            >
               <Box display="flex" alignItems="center">
                 Create New{" "}
                 <Box ml=".5rem">
                   <AiOutlinePlus />
                 </Box>
               </Box>
-            </button>
+            </Button>
           </Box>
           <TabPanel value={value} index={0}>
             <>
-              {dummyData.map((link) => (
+              {links.map((link) => (
                 <LinkCard key={link.id} {...link} />
               ))}
             </>

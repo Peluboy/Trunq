@@ -13,3 +13,52 @@
   border-radius: 6px;
   color: white;
 }
+
+.form-input {
+  width: 553px;
+  height: 40px;
+  outline: none;
+  border: 1px solid #a1a1a1;
+  padding: 0 1rem;
+  background: #ffffff;
+  border-radius: 5px;
+  margin-bottom: 0.5rem;
+}
+
+.form-input::placeholder {
+  color: #e4e4e4;
+}
+
+.custom-form-input {
+  width: 553px;
+  height: 40px;
+  outline: none;
+  border: 1px solid #a1a1a1;
+  background: #ffffff;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+}
+
+.custom-form-input > button {
+  width: 100px;
+  height: 100%;
+  outline: none;
+  border: none;
+  font-weight: 600;
+  background: #e3e3e3;
+  border-radius: 5px 0 0 5px;
+  padding: 0 1rem;
+}
+
+.custom-form-input > input {
+  width: 453px;
+  height: 30px;
+  outline: none;
+  border: none;
+  padding: 0 1rem;
+}
+
+.custom-form-input > input::placeholder {
+  color: #e4e4e4;
+}
