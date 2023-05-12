@@ -25,6 +25,15 @@ const dummyData = [
     shortCode: "trunq",
     totalClicks: 100,
   },
+
+  {
+    id: "0hg5gt67k",
+    createdAt: new Date(),
+    name: "Another website",
+    longURL: "https://example.com/longURL/92bgthds?n",
+    shortCode: "hg456",
+    totalClicks: 63,
+  },
 ];
 interface TabPanelProps {
   children?: React.ReactNode;

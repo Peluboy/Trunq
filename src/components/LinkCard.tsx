@@ -22,10 +22,11 @@ const LinkCard = ({
         bgcolor="#fff"
         p="1.5rem 2rem"
         borderRadius="8px"
+        mb="1rem"
         boxShadow="rgba(0, 0, 0, 0.04) 0px 3px 5px;"
       >
         <Box>
-          <Typography variant="overline" component="p">
+          <Typography variant="overline" color="textSecondary" component="p">
             Created at {format(createdAt, "d MMM, HH:mm")}
           </Typography>
           <Box>

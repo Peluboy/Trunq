@@ -16,6 +16,7 @@ export const theme = createTheme({
     },
   },
   typography: {
+    // fontFamily: "Stagnan, sans-serif",
     h4: {
       color: "#1D2A36",
       fontWeight: 600,
@@ -27,6 +28,7 @@ export const theme = createTheme({
     body2: {
       color: "#a1a1a1",
       fontSize: "14px",
+      fontWeight: 400,
     },
 
     overline: {

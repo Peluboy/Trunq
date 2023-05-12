@@ -1,3 +1,24 @@
+@font-face {
+  font-family: "Stagnan";
+  src: local("Stagnan"),
+    url(/src/assets/fonts/Stagnan\ Bold.otf) format("opentype");
+  font-weight: 700;
+}
+
+@font-face {
+  font-family: "Stagnan";
+  src: local("Stagnan"),
+    url(/src/assets/fonts/Stagnan\ SemiBold.otf) format("opentype");
+  font-weight: 600;
+}
+
+@font-face {
+  font-family: "Stagnan";
+  src: local("Stagnan"),
+    url(/src/assets/fonts/Stagnan\ Regular.otf) format("opentype");
+  font-weight: 500;
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -6,4 +27,5 @@
 
 body {
   background-color: #f4faff;
+  font-family: "Stagnan" sans-serif;
 }
