@@ -1,0 +1,15 @@
+.trunq-logo {
+  width: 100px;
+}
+
+.custom-button {
+  height: 2.3rem;
+  padding: 0 1rem;
+  outline: none;
+  border: none;
+  cursor: pointer;
+  background-color: #1463ff;
+  font-weight: 500;
+  border-radius: 6px;
+  color: white;
+}
