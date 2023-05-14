@@ -31,7 +31,9 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "firebase-emulators": "firebase emulators:start --export-on-exit --import=./firebase-emulators",
+    "kill": "npx kill-port 3000 8080 9000 5001 5000 9199"
   },
   "eslintConfig": {
     "extends": [

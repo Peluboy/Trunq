@@ -112,7 +112,7 @@ const TopBar = () => {
       name,
       longURL,
       customURL,
-      createdAt: serverTimestamp(),
+      createdAt: new Date(),
       shortCode: nanoid(6),
       totalClicks: 0,
     };
@@ -121,8 +121,11 @@ const TopBar = () => {
       const userDocRef = doc(collection(firestore, "links"), currentUser.uid);
       const linksCollectionRef = collection(userDocRef, "links");
       const resp = await addDoc(linksCollectionRef, link);
+      setLinks((links) => [
+        ...links,
+        { ...link, createdAt: { toDate: () => new Date() }, id: resp.id },
+      ]);
     }
-
     setOpenModal(false);
   };
 
@@ -208,9 +211,14 @@ const TopBar = () => {
           </Box>
           <TabPanel value={value} index={0}>
             <>
-              {links.map((link) => (
-                <LinkCard key={link.id} {...link} />
-              ))}
+              {links
+                .sort(
+                  (prevLink, nextLink) =>
+                    Number(nextLink.createdAt) - Number(prevLink.createdAt)
+                )
+                .map((link) => (
+                  <LinkCard key={link.id} {...link} />
+                ))}
             </>
           </TabPanel>
           <TabPanel value={value} index={1}>

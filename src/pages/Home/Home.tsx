@@ -1,7 +1,10 @@
 import { useState } from "react";
 import { TextField, Typography, Button } from "@mui/material";
 import { auth } from "../../utils/Firebase";
-import { createUserWithEmailAndPassword } from "firebase/auth";
+import {
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+} from "firebase/auth";
 
 const Home = () => {
   const [form, setForm] = useState({
@@ -32,6 +35,10 @@ const Home = () => {
     }
   };
 
+  const handleSignin = async () => {
+    await signInWithEmailAndPassword(auth, form.email, form.password);
+  };
+
   // console.log(auth.currentUser);
 
   return (
@@ -55,6 +62,7 @@ const Home = () => {
         Password
       </TextField>
       <Button onClick={handleSignup}>Sign Up</Button>
+      <Button onClick={handleSignin}>Sign In</Button>
     </>
   );
 };
