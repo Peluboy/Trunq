@@ -27,7 +27,7 @@ const LinkCard = ({
       >
         <Box>
           <Typography variant="overline" color="textSecondary" component="p">
-            Created at {format(createdAt, "d MMM, HH:mm")}
+            Created at {format(createdAt.toDate(), "d MMM, HH:mm")}
           </Typography>
           <Box>
             <Typography variant="h5" component="h5">

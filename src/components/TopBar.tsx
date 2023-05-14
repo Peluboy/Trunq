@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useState } from "react";
 import "../styles/account.css";
 import { Box, Tabs, Tab, Typography, Grid, Button } from "@mui/material";
@@ -7,12 +7,35 @@ import { BsQrCodeScan } from "react-icons/bs";
 import { AiOutlinePlus } from "react-icons/ai";
 import LinkCard from "./LinkCard";
 import ShortenURLModal from "./ShortenURLModel";
+import { firestore, auth } from "../utils/Firebase";
+import { nanoid } from "nanoid";
+// import { FieldValue } from "firebase/firestore";
+import {
+  getDocs,
+  doc,
+  addDoc,
+  collection,
+  serverTimestamp,
+} from "firebase/firestore";
 
 export interface LinkCardProps {
   id: string;
-  createdAt: Date;
+  createdAt: {
+    toDate(): Date;
+  };
   name: string;
   longURL: string;
+  shortCode: string;
+  totalClicks: number;
+}
+interface Link {
+  id: string;
+  name: string;
+  longURL: string;
+  customURL: string;
+  createdAt: {
+    toDate(): Date;
+  };
   shortCode: string;
   totalClicks: number;
 }
@@ -70,7 +93,7 @@ function a11yProps(index: number) {
 }
 
 const TopBar = () => {
-  const [links, setLinks] = useState(dummyData);
+  const [links, setLinks] = useState<Link[]>([]);
 
   const [openModal, setOpenModal] = useState(false);
 
@@ -79,10 +102,57 @@ const TopBar = () => {
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
   };
+
+  const handleCreateShortenLink = async (
+    name: string,
+    longURL: string,
+    customURL: string
+  ) => {
+    const link = {
+      name,
+      longURL,
+      customURL,
+      createdAt: serverTimestamp(),
+      shortCode: nanoid(6),
+      totalClicks: 0,
+    };
+    const { currentUser } = auth;
+    if (currentUser) {
+      const userDocRef = doc(collection(firestore, "links"), currentUser.uid);
+      const linksCollectionRef = collection(userDocRef, "links");
+      const resp = await addDoc(linksCollectionRef, link);
+    }
+
+    setOpenModal(false);
+  };
+
+  useEffect(() => {
+    const fetchLinks = async () => {
+      const { currentUser } = auth;
+      if (currentUser) {
+        const userDocRef = doc(collection(firestore, "links"), currentUser.uid);
+        const linksCollectionRef = collection(userDocRef, "links");
+        const snapshot = await getDocs(linksCollectionRef);
+
+        const tempLinks: Link[] = [];
+        snapshot.forEach((doc) =>
+          tempLinks.push({
+            ...doc.data(),
+            id: doc.id,
+            // createdAt: doc.data().createdAt.toDate(),
+          } as Link)
+        );
+        setLinks(tempLinks);
+      }
+    };
+    fetchLinks();
+  }, []);
+
   return (
     <>
       {openModal && (
         <ShortenURLModal
+          createShortenLink={handleCreateShortenLink}
           open={openModal}
           handleClose={() => setOpenModal(false)}
         />

@@ -19,9 +19,13 @@ export interface ShortenURLModalProps {
     event: React.MouseEvent<SVGElement>,
     reason: "backdropClick" | "escapeKeyDown"
   ) => void;
+  createShortenLink: (name: string, longUrl: string, customUrl: string) => void;
 }
 
-const ShortenURLModal = ({ handleClose }: ShortenURLModalProps) => {
+const ShortenURLModal = ({
+  handleClose,
+  createShortenLink,
+}: ShortenURLModalProps) => {
   const [form, setForm] = useState({
     name: "",
     longUrl: "",
@@ -33,6 +37,10 @@ const ShortenURLModal = ({ handleClose }: ShortenURLModalProps) => {
       ...oldform,
       [event.target.name]: event.target.value,
     }));
+
+  const handleSubmit = () => {
+    createShortenLink(form.name, form.longUrl, form.customUrl);
+  };
 
   return (
     <Dialog open={true} onClose={handleClose} fullWidth>
@@ -97,12 +105,10 @@ const ShortenURLModal = ({ handleClose }: ShortenURLModalProps) => {
       <DialogActions>
         <Box mb={1} mr={1.5}>
           <Button
+            onClick={handleSubmit}
             variant="contained"
             disableElevation
             autoFocus
-            onClick={() => {
-              console.log(form);
-            }}
             color="primary"
           >
             Shorten Link
