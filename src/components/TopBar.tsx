@@ -1,64 +1,55 @@
-import React, { useEffect } from "react";
-import { useState } from "react";
+import React, { useEffect, useCallback, useState } from "react";
 import "../styles/account.css";
-import { Box, Tabs, Tab, Typography, Grid, Button } from "@mui/material";
+import {
+  Box,
+  Tabs,
+  Tab,
+  Typography,
+  Grid,
+  Button,
+  Snackbar,
+  CircularProgress,
+  useMediaQuery,
+  Hidden,
+} from "@mui/material";
 import { BiHome } from "react-icons/bi";
 import { BsQrCodeScan } from "react-icons/bs";
 import { AiOutlinePlus } from "react-icons/ai";
 import LinkCard from "./LinkCard";
-import ShortenURLModal from "./ShortenURLModel";
+import ShortenURLModal from "../components/ShortenURLModel";
 import { firestore, auth } from "../utils/Firebase";
 import { nanoid } from "nanoid";
-// import { FieldValue } from "firebase/firestore";
+import copy from "copy-to-clipboard";
 import {
   getDocs,
   doc,
   addDoc,
+  setDoc,
   collection,
-  serverTimestamp,
+  deleteDoc,
 } from "firebase/firestore";
+import { isValid } from "date-fns";
+import NoLinks from "../assets/images/no_links.svg";
+import { AnalyticsProps } from "./Analytics";
 
 export interface LinkCardProps {
   id: string;
-  createdAt: {
-    toDate(): Date;
-  };
+  createdAt: Date;
   name: string;
   longURL: string;
   shortCode: string;
   totalClicks: number;
-}
-interface Link {
-  id: string;
-  name: string;
-  longURL: string;
-  customURL: string;
-  createdAt: {
-    toDate(): Date;
-  };
-  shortCode: string;
-  totalClicks: number;
+  clickLocation?: string;
+  // geolocation: string;
+  deleteLink: (linkDocID: string) => Promise<void>;
+  copyLink: (shortUrl: string) => void;
 }
 
-const dummyData = [
-  {
-    id: "03f5gy55k",
-    createdAt: new Date(),
-    name: "My website",
-    longURL: "https://example.com/longURL/998gthds?./:hn",
-    shortCode: "trunq",
-    totalClicks: 100,
-  },
+export interface Link extends LinkCardProps {
+  deleteLink: (linkDocID: string) => Promise<void>;
+  copyLink: (shortUrl: string) => void;
+}
 
-  {
-    id: "0hg5gt67k",
-    createdAt: new Date(),
-    name: "Another website",
-    longURL: "https://example.com/longURL/92bgthds?n",
-    shortCode: "hg456",
-    totalClicks: 63,
-  },
-];
 interface TabPanelProps {
   children?: React.ReactNode;
   index: number;
@@ -92,12 +83,20 @@ function a11yProps(index: number) {
   };
 }
 
-const TopBar = () => {
+const TopBar = ({
+  updateStats,
+}: {
+  updateStats: (clicks: number, links: number) => void;
+}) => {
+  const [newLinkToaster, setNewLinkToaster] = useState(false);
   const [links, setLinks] = useState<Link[]>([]);
-
   const [openModal, setOpenModal] = useState(false);
-
   const [value, setValue] = useState(0);
+  const [fetchingLinks, setFetchingLinks] = useState(true);
+  const [totalClicks, setTotalClicks] = useState(0);
+  const [totalLinks, setTotalLinks] = useState(0);
+
+  const isMobile = useMediaQuery("(max-width: 600px)");
 
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
@@ -108,6 +107,11 @@ const TopBar = () => {
     longURL: string,
     customURL: string
   ) => {
+    const isValidURL = /^(ftp|http|https):\/\/[^ "]+$/.test(longURL);
+    if (!isValidURL) {
+      longURL = `http://${longURL}`;
+    }
+
     const link = {
       name,
       longURL,
@@ -115,44 +119,97 @@ const TopBar = () => {
       createdAt: new Date(),
       shortCode: nanoid(6),
       totalClicks: 0,
+      // geolocation: "",
+      userID: auth.currentUser?.uid,
     };
-    const { currentUser } = auth;
-    if (currentUser) {
-      const userDocRef = doc(collection(firestore, "links"), currentUser.uid);
-      const linksCollectionRef = collection(userDocRef, "links");
-      const resp = await addDoc(linksCollectionRef, link);
-      setLinks((links) => [
-        ...links,
-        { ...link, createdAt: { toDate: () => new Date() }, id: resp.id },
-      ]);
-    }
+
+    const linksPathRef = collection(firestore, `users/${link.userID}/links`);
+    const resp = await addDoc(linksPathRef, link);
+
+    const linkID = resp.id;
+
+    const linksCollectionRef = collection(firestore, "links");
+    const linkDocRef = doc(linksCollectionRef, link.shortCode);
+    await setDoc(linkDocRef, {
+      linkID: linkID,
+      longURL: link.longURL,
+      userID: link.userID,
+    });
+
+    const newLink: Link = {
+      ...link,
+      createdAt: link.createdAt,
+      id: linkID,
+      deleteLink: handleDeleteLink,
+      copyLink: handleCopyLink,
+    };
+
+    setLinks((prevLinks) => [...prevLinks, newLink]);
     setOpenModal(false);
+
+    setTotalClicks((prevTotalClicks) => prevTotalClicks + 1);
+    setTotalLinks((prevTotalLinks) => prevTotalLinks + 1);
   };
 
   useEffect(() => {
-    const fetchLinks = async () => {
-      const { currentUser } = auth;
-      if (currentUser) {
-        const userDocRef = doc(collection(firestore, "links"), currentUser.uid);
-        const linksCollectionRef = collection(userDocRef, "links");
-        const snapshot = await getDocs(linksCollectionRef);
+    const userUid = auth.currentUser?.uid;
+    const linksPathRef = collection(firestore, `users/${userUid}/links`);
 
-        const tempLinks: Link[] = [];
-        snapshot.forEach((doc) =>
-          tempLinks.push({
-            ...doc.data(),
-            id: doc.id,
-            // createdAt: doc.data().createdAt.toDate(),
-          } as Link)
-        );
-        setLinks(tempLinks);
-      }
+    const fetchLinks = async () => {
+      const snapshot = await getDocs(linksPathRef);
+
+      const tempLinks: Link[] = [];
+      let clicks = 0;
+      snapshot.forEach((doc) => {
+        const data = doc.data() as LinkCardProps;
+        tempLinks.push({
+          ...data,
+          id: doc.id,
+          deleteLink: handleDeleteLink,
+          copyLink: handleCopyLink,
+        });
+        clicks += data.totalClicks;
+      });
+
+      setLinks(tempLinks);
+      setTotalClicks(clicks);
+      setTotalLinks(tempLinks.length);
+      updateStats(clicks, tempLinks.length);
+
+      setTimeout(() => setFetchingLinks(false), 1000);
     };
+
     fetchLinks();
+  }, [links]);
+
+  const handleDeleteLink = useCallback(async (linkDocID: string) => {
+    const { currentUser } = auth;
+    if (window.confirm("Are you sure you want to delete this link")) {
+      if (currentUser) {
+        const userDocRef = doc(collection(firestore, "users"), currentUser.uid);
+        const linkDocRef = doc(collection(userDocRef, "links"), linkDocID);
+        await deleteDoc(linkDocRef);
+      }
+      setLinks((oldLinks) => oldLinks.filter((link) => link.id !== linkDocID));
+
+      setTotalLinks((prevTotalLinks) => prevTotalLinks - 1);
+    }
+  }, []);
+
+  const handleCopyLink = useCallback((shortUrl: string) => {
+    const completeUrl = `https://${shortUrl}`;
+    copy(completeUrl);
+    setNewLinkToaster(true);
   }, []);
 
   return (
     <>
+      <Snackbar
+        open={newLinkToaster}
+        onClose={() => setNewLinkToaster(false)}
+        autoHideDuration={2000}
+        message="Link copied to the clipboard"
+      />
       {openModal && (
         <ShortenURLModal
           createShortenLink={handleCreateShortenLink}
@@ -161,12 +218,13 @@ const TopBar = () => {
         />
       )}
       <Grid container justifyContent="center">
-        <Grid item xs={8}>
+        <Grid item xs={12} sm={8}>
           <Box
             sx={{ borderBottom: 1, borderColor: "divider" }}
             display="flex"
             justifyContent="space-between"
             alignItems="center"
+            p={{ xs: "16px 16px 0 16px", sm: 0 }}
           >
             <Tabs
               value={value}
@@ -196,29 +254,60 @@ const TopBar = () => {
                 {...a11yProps(1)}
               />
             </Tabs>
-            <Button
-              variant="contained"
-              disableElevation
-              onClick={() => setOpenModal(true)}
-            >
-              <Box display="flex" alignItems="center">
-                Create New{" "}
-                <Box ml=".5rem">
-                  <AiOutlinePlus />
+            <Hidden xsDown>
+              <Button
+                variant="contained"
+                disableElevation
+                onClick={() => setOpenModal(true)}
+              >
+                <Box display="flex" alignItems="center">
+                  {isMobile ? "New" : "Create New"}{" "}
+                  <Box ml=".5rem">
+                    <AiOutlinePlus />
+                  </Box>
                 </Box>
-              </Box>
-            </Button>
+              </Button>
+            </Hidden>
           </Box>
           <TabPanel value={value} index={0}>
             <>
-              {links
-                .sort(
-                  (prevLink, nextLink) =>
-                    Number(nextLink.createdAt) - Number(prevLink.createdAt)
-                )
-                .map((link) => (
-                  <LinkCard key={link.id} {...link} />
-                ))}
+              {fetchingLinks ? (
+                <Box textAlign="center" mb={2}>
+                  <CircularProgress />
+                </Box>
+              ) : !links.length ? (
+                <Box
+                  textAlign="center"
+                  display="flex"
+                  justifyContent="center"
+                  flexDirection="column"
+                  alignItems="center"
+                >
+                  <img src={NoLinks} alt="no_links" className="nolinks" />
+                  <Typography variant="h6" ml={4} mb={2}>
+                    You have no links
+                  </Typography>
+                </Box>
+              ) : (
+                links
+                  .sort((prevLink, nextLink) => {
+                    const prevTime = isValid(prevLink.createdAt)
+                      ? prevLink.createdAt.getTime()
+                      : 0;
+                    const nextTime = isValid(nextLink.createdAt)
+                      ? nextLink.createdAt.getTime()
+                      : 0;
+                    return nextTime - prevTime;
+                  })
+                  .map((link) => (
+                    <LinkCard
+                      key={link.id}
+                      {...link}
+                      deleteLink={handleDeleteLink}
+                      copyLink={handleCopyLink}
+                    />
+                  ))
+              )}
             </>
           </TabPanel>
           <TabPanel value={value} index={1}>

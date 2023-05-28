@@ -30,12 +30,12 @@
 }
 
 .custom-form-input {
-  width: 553px;
+  /* width: 553px;
   height: 40px;
   outline: none;
   border: 1px solid #a1a1a1;
   background: #ffffff;
-  border-radius: 5px;
+  border-radius: 5px; */
   display: flex;
   align-items: center;
 }
@@ -61,4 +61,11 @@
 
 .custom-form-input > input::placeholder {
   color: #e4e4e4;
+}
+
+.nolinks {
+  padding-top: 20px;
+  width: 225px;
+  margin-bottom: 24px;
+  height: auto;
 }

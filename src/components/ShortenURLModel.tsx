@@ -6,8 +6,9 @@ import {
   Dialog,
   DialogActions,
   DialogContent,
-  DialogTitle,
   Typography,
+  TextField,
+  CircularProgress,
 } from "@mui/material";
 
 import { BsArrowRight } from "react-icons/bs";
@@ -32,73 +33,125 @@ const ShortenURLModal = ({
     customUrl: "",
   });
 
+  const [errors, setErrors] = useState({
+    name: "",
+    longUrl: "",
+    // customUrl: "",
+  });
+
+  const [loading, setLoading] = useState(false);
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) =>
     setForm((oldform) => ({
       ...oldform,
       [event.target.name]: event.target.value,
     }));
 
-  const handleSubmit = () => {
-    createShortenLink(form.name, form.longUrl, form.customUrl);
+  const handleSubmit = async () => {
+    const errors = {} as { name: string; longUrl: string };
+
+    const tName = form.name.trim();
+    const tLongUrl = form.longUrl.trim();
+    const expression =
+      /[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)?/gi;
+    const regex = new RegExp(expression);
+
+    if (tName.length < 3 || tName.length > 15) {
+      errors.name = "The name should be between 3 and 15 characters long";
+    }
+
+    if (!regex.test(tLongUrl)) {
+      errors.longUrl = "URL is invalid";
+    }
+
+    if (Object.keys(errors).length > 0) {
+      return setErrors(errors);
+    }
+    setLoading(true);
+    try {
+      setTimeout(
+        () => createShortenLink(tName, tLongUrl, form.customUrl),
+        1000
+      );
+    } catch (error) {
+      setLoading(false);
+    }
   };
 
   return (
     <Dialog open={true} onClose={handleClose} fullWidth>
-      <Box display="flex" justifyContent="space-between" alignItems="center">
-        <DialogTitle>
-          <Typography>Shorten URL</Typography>
-        </DialogTitle>
-        <Box mr={2}>
-          <GrClose
-            onClick={(event: React.MouseEvent<SVGElement>) =>
-              handleClose(event, "backdropClick")
-            }
-          />
-        </Box>
+      <Box
+        display="flex"
+        justifyContent="space-between"
+        alignItems="center"
+        px={3}
+        pt={3}
+      >
+        <Typography variant="h5">Shorten URL</Typography>
+        <GrClose
+          cursor="pointer"
+          onClick={(event: React.MouseEvent<SVGElement>) =>
+            handleClose(event, "backdropClick")
+          }
+        />
       </Box>
-      <DialogContent>
+      <DialogContent sx={{ px: 3, pb: 2 }}>
         <Box
           sx={{
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "flex-start",
-            alignItems: "flex-start",
+            display: "grid",
+            gap: "0.5rem",
+            gridTemplateColumns: "1fr",
           }}
         >
           <Box display="flex" flexDirection="column">
             <Typography variant="overline">URL Name</Typography>
-            <input
+            <TextField
+              error={!!errors.name}
+              helperText={errors.name}
               value={form.name}
               name="name"
               onChange={handleChange}
               type="text"
               placeholder="New Sample"
-              className="form-input"
             />
           </Box>
           <Box display="flex" flexDirection="column">
             <Typography variant="overline">Enter Long URL</Typography>
-            <input
+            <TextField
+              error={!!errors.longUrl}
+              helperText={errors.longUrl}
               value={form.longUrl}
               name="longUrl"
               onChange={handleChange}
               type="text"
               placeholder="https://webinar.online/example?:hgbe123pp"
-              className="form-input"
             />
           </Box>
           <Box display="flex" flexDirection="column">
             <Typography variant="overline">Your Custom URL</Typography>
-            <div className="custom-form-input">
-              <button>trunq.com/</button>
-              <input
+            <Box display="flex" alignItems="stretch">
+              <Button
+                variant="contained"
+                disabled
+                disableElevation
+                size="small"
+                sx={{
+                  borderRadius: "4px 0 0 4px",
+                }}
+              >
+                <Typography variant="body1">trunq.com/</Typography>
+              </Button>
+              <TextField
                 value={form.customUrl}
                 name="customUrl"
                 onChange={handleChange}
                 type="text"
                 placeholder="e.g kolohub (optional)"
+                sx={{
+                  flex: 1,
+                  borderRadius: "0 4px 4px 0 !important",
+                }}
               />
-            </div>
+            </Box>
           </Box>
         </Box>
       </DialogContent>
@@ -110,8 +163,13 @@ const ShortenURLModal = ({
             disableElevation
             autoFocus
             color="primary"
+            disabled={loading}
           >
-            Shorten Link
+            {loading ? (
+              <CircularProgress size={20} color="inherit" />
+            ) : (
+              "Shorten Link"
+            )}
             <Box ml=".2rem" display="flex" alignItems="center">
               <BsArrowRight />
             </Box>
