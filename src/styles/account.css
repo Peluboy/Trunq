@@ -69,3 +69,8 @@
   margin-bottom: 24px;
   height: auto;
 }
+
+.barcode {
+  width: 100%;
+  opacity: 0.05;
+}

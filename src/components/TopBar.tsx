@@ -30,7 +30,7 @@ import {
 } from "firebase/firestore";
 import { isValid } from "date-fns";
 import NoLinks from "../assets/images/no_links.svg";
-import { AnalyticsProps } from "./Analytics";
+import QrCodeCard from "./QrCodeCard";
 
 export interface LinkCardProps {
   id: string;
@@ -311,7 +311,7 @@ const TopBar = ({
             </>
           </TabPanel>
           <TabPanel value={value} index={1}>
-            Generate QR Code
+            <QrCodeCard />
           </TabPanel>
         </Grid>
       </Grid>
