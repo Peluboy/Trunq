@@ -40,7 +40,7 @@ const QrCodeProvider = ({ children }: { children: ReactNode }) => {
 
       const config = {
         headers: {
-          Authorization: "Bearer cc45e660-fdbe-11ed-b7c8-4366083cdb47",
+          Authorization: `Bearer ${process.env.REACT_APP_QR_API_KEY}`,
         },
       };
 

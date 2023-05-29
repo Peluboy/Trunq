@@ -39,13 +39,9 @@ const LinkRedirect = () => {
           // Check if the longURL has a valid protocol
           const urlPattern = /^(?:\w+:)?\/\/(\S+)$/;
           if (urlPattern.test(longURL)) {
-            setTimeout(() => {
-              window.location.href = longURL;
-            }, 2000); // Change the delay as desired
+            window.location.href = longURL;
           } else {
-            setTimeout(() => {
-              window.location.href = `http://${longURL}`;
-            }, 2000); // Change the delay as desired
+            window.location.href = `http://${longURL}`;
           }
         }
       }
@@ -62,21 +58,8 @@ const LinkRedirect = () => {
       </Box>
     );
   }
-  // else {
-  //   if (auth.currentUser) {
-  //     return (
-  //       <Box mt={10} textAlign="center">
-  //         <Typography>Link is invalid</Typography>
-  //       </Box>
-  //     );
-  //   } else {
-  //     return (
-  //       <Box mt={10} textAlign="center">
-  //         <Typography>Please log in to access the link</Typography>
-  //       </Box>
-  //     );
-  //   }
-  // }
+
+  return null;
 };
 
 export default LinkRedirect;
