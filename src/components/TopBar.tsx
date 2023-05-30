@@ -31,6 +31,7 @@ import {
 import { isValid } from "date-fns";
 import NoLinks from "../assets/images/no_links.svg";
 import QrCodeCard from "./QrCodeCard";
+// import { updateOGPTags } from "../openGraphUtils";
 
 export interface LinkCardProps {
   id: string;
@@ -38,6 +39,7 @@ export interface LinkCardProps {
   name: string;
   longURL: string;
   shortCode: string;
+  description: string;
   totalClicks: number;
   clickLocation?: string;
   // geolocation: string;
@@ -95,6 +97,7 @@ const TopBar = ({
   const [fetchingLinks, setFetchingLinks] = useState(true);
   const [totalClicks, setTotalClicks] = useState(0);
   const [totalLinks, setTotalLinks] = useState(0);
+  const [customUrl, setCustomUrl] = useState("");
 
   const isMobile = useMediaQuery("(max-width: 600px)");
 
@@ -117,11 +120,17 @@ const TopBar = ({
       longURL,
       customURL,
       createdAt: new Date(),
-      shortCode: nanoid(6),
+      shortCode: customURL ? "" : nanoid(6),
       totalClicks: 0,
-      // geolocation: "",
+      description: "",
       userID: auth.currentUser?.uid,
     };
+
+    if (customURL) {
+      link.shortCode = customURL;
+    } else {
+      link.shortCode = nanoid(6);
+    }
 
     const linksPathRef = collection(firestore, `users/${link.userID}/links`);
     const resp = await addDoc(linksPathRef, link);
@@ -180,7 +189,7 @@ const TopBar = ({
     };
 
     fetchLinks();
-  }, [links]);
+  }, [auth.currentUser?.uid, links]);
 
   const handleDeleteLink = useCallback(async (linkDocID: string) => {
     const { currentUser } = auth;
@@ -215,6 +224,8 @@ const TopBar = ({
           createShortenLink={handleCreateShortenLink}
           open={openModal}
           handleClose={() => setOpenModal(false)}
+          customUrl={customUrl}
+          setCustomUrl={setCustomUrl}
         />
       )}
       <Grid container justifyContent="center">

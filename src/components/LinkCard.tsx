@@ -1,11 +1,14 @@
-import { Box, Typography, useMediaQuery } from "@mui/material";
+import { Box, Typography, useMediaQuery, Tooltip } from "@mui/material";
 import { BsBarChartLine } from "react-icons/bs";
 import { IoCopyOutline } from "react-icons/io5";
 import { RiDeleteBin6Line } from "react-icons/ri";
 import { LinkCardProps } from "../components/TopBar";
 import format from "date-fns/format";
-import { memo, useEffect, useState } from "react";
 import { isValid } from "date-fns";
+// import Markdown from "./Markdown";
+// import { Helmet } from "react-helmet-async";
+// import { updateOGPTags } from "../openGraphUtils";
+import { useState, useEffect, memo } from "react";
 
 const LinkCard = ({
   id,
@@ -46,8 +49,26 @@ const LinkCard = ({
     }
   }, [id]);
 
+  useEffect(() => {
+    // Update the document title dynamically
+    const updateDocumentTitle = () => {
+      if (longURL) {
+        document.title = `${name} - ${longURL}`;
+      }
+    };
+
+    updateDocumentTitle();
+  }, [longURL, name]);
+
   return (
     <>
+      {/* <Helmet>
+        {updateOGPTags(name, longURL, shortCode).map(
+          ({ property, content }) => (
+            <meta key={property} property={property} content={content} />
+          )
+        )}
+      </Helmet> */}
       <Box
         display="flex"
         justifyContent="space-between"
@@ -79,15 +100,15 @@ const LinkCard = ({
           </Box>
 
           <Box mt={isMobile ? ".8rem" : "1rem"}>
-            {" "}
-            <Typography
-              variant="body2"
-              color="primary"
-              fontSize={isMobile ? "11px" : "14px"}
-            >
-              {" "}
-              {shortUrl}
-            </Typography>
+            <Tooltip title={longURL} arrow placement="top">
+              <Typography
+                variant="body2"
+                color="primary"
+                fontSize={isMobile ? "11px" : "14px"}
+              >
+                {shortUrl}
+              </Typography>
+            </Tooltip>
           </Box>
         </Box>
         <Box display="flex" gap=".5rem">
@@ -109,6 +130,7 @@ const LinkCard = ({
           />
         </Box>
       </Box>
+      {/* <Markdown shortcode={shortCode} /> */}
     </>
   );
 };

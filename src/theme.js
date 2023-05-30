@@ -35,6 +35,12 @@ export const theme = createTheme({
       fontWeight: 600,
       color: "#1D2A36",
     },
+    h6: {
+      textTransform: "lowercase",
+      fontWeight: 400,
+      color: "#767676",
+      fontSize: "13px",
+    },
     body2: {
       color: "#a1a1a1",
       fontSize: "14px",
@@ -50,7 +56,9 @@ export const theme = createTheme({
     },
 
     overline: {
-      color: "#a1a1a1",
+      color: "#767676",
+      fontSize: "11px",
+      fontWeight: 500,
     },
     button: {
       textTransform: "capitalize",

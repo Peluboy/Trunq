@@ -80,7 +80,7 @@ const AuthModal = ({ onClose }: AuthModalProps) => {
         justifyContent="space-between"
         alignItems="center"
       >
-        <Box pl={3} pt={3} pb={1.5}>
+        <Box pl={3} pt={3} pb={0.5}>
           <Typography variant="h5">
             {isSignIn ? "Welcome back!" : "Get Started!"}
           </Typography>
@@ -96,24 +96,36 @@ const AuthModal = ({ onClose }: AuthModalProps) => {
         </Box>
       </Box>
       <DialogContent>
-        <Box display="flex" flexDirection="column" gap={3}>
-          <TextField
-            value={form.email}
-            name="email"
-            onChange={handleChange}
-            label="Email"
-          >
-            Email
-          </TextField>
-          <TextField
-            type="password"
-            value={form.password}
-            name="password"
-            onChange={handleChange}
-            label="Password"
-          >
-            Password
-          </TextField>
+        <Box display="flex" flexDirection="column" gap={1}>
+          <Box display="flex" flexDirection="column">
+            <Typography variant="overline">Enter your Email</Typography>
+            <TextField
+              value={form.email}
+              name="email"
+              onChange={handleChange}
+              // label="Email"
+              variant="outlined"
+              required
+              size="small"
+            >
+              Email
+            </TextField>
+          </Box>
+          <Box display="flex" flexDirection="column">
+            <Typography variant="overline">Password</Typography>
+            <TextField
+              type="password"
+              value={form.password}
+              name="password"
+              onChange={handleChange}
+              // label="Password"
+              size="small"
+              variant="outlined"
+              required
+            >
+              Password
+            </TextField>
+          </Box>
         </Box>
         <Box color="red" mt={2}>
           <Typography>{error}</Typography>
@@ -128,9 +140,11 @@ const AuthModal = ({ onClose }: AuthModalProps) => {
           mb={1}
           mx={2}
         >
-          <Typography onClick={() => setIsSignIn((o) => !o)}>
-            {isSignIn ? "Don't have an account?" : "Already have an account"}
-          </Typography>
+          <Button>
+            <Typography onClick={() => setIsSignIn((o) => !o)} variant="body2">
+              {isSignIn ? "Don't have an account?" : "Already have an account"}
+            </Typography>
+          </Button>
           <Button
             onClick={handleAuth}
             variant="contained"

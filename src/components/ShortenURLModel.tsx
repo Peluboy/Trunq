@@ -21,11 +21,15 @@ export interface ShortenURLModalProps {
     reason: "backdropClick" | "escapeKeyDown"
   ) => void;
   createShortenLink: (name: string, longUrl: string, customUrl: string) => void;
+  customUrl: string;
+  setCustomUrl: React.Dispatch<React.SetStateAction<string>>;
 }
 
 const ShortenURLModal = ({
   handleClose,
   createShortenLink,
+  customUrl,
+  setCustomUrl,
 }: ShortenURLModalProps) => {
   const [form, setForm] = useState({
     name: "",
@@ -45,6 +49,16 @@ const ShortenURLModal = ({
       ...oldform,
       [event.target.name]: event.target.value,
     }));
+
+  const handleCustomUrlChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    setCustomUrl(event.target.value);
+    setForm((oldForm) => ({
+      ...oldForm,
+      customUrl: event.target.value,
+    }));
+  };
 
   const handleSubmit = async () => {
     const errors = {} as { name: string; longUrl: string };
@@ -111,6 +125,7 @@ const ShortenURLModal = ({
               name="name"
               onChange={handleChange}
               type="text"
+              size="small"
               placeholder="New Sample"
             />
           </Box>
@@ -121,6 +136,7 @@ const ShortenURLModal = ({
               helperText={errors.longUrl}
               value={form.longUrl}
               name="longUrl"
+              size="small"
               onChange={handleChange}
               type="text"
               placeholder="https://webinar.online/example?:hgbe123pp"
@@ -128,22 +144,23 @@ const ShortenURLModal = ({
           </Box>
           <Box display="flex" flexDirection="column">
             <Typography variant="overline">Your Custom URL</Typography>
-            <Box display="flex" alignItems="stretch">
+            <Box display="flex" alignItems="stretch" gap={0.5}>
               <Button
                 variant="contained"
                 disabled
                 disableElevation
                 size="small"
-                sx={{
-                  borderRadius: "4px 0 0 4px",
-                }}
+                // sx={{
+                //   borderRadius: "4px 0 0 4px",
+                // }}
               >
-                <Typography variant="body1">trunq.com/</Typography>
+                <Typography variant="h6">trunq.xyz/</Typography>
               </Button>
               <TextField
-                value={form.customUrl}
+                value={customUrl}
+                size="small"
                 name="customUrl"
-                onChange={handleChange}
+                onChange={handleCustomUrlChange}
                 type="text"
                 placeholder="e.g kolohub (optional)"
                 sx={{

@@ -41,7 +41,7 @@ const LinkRedirect = () => {
           if (urlPattern.test(longURL)) {
             setTimeout(() => {
               window.location.href = longURL;
-            }, 1000); // Change the delay as desired
+            }, 500); // Change the delay as desired
           }
           // else {
           //   setTimeout(() => {
