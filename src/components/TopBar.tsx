@@ -22,11 +22,15 @@ import { nanoid } from "nanoid";
 import copy from "copy-to-clipboard";
 import {
   getDocs,
+  getDoc,
   doc,
   addDoc,
   setDoc,
   collection,
   deleteDoc,
+  query,
+  limit,
+  where,
 } from "firebase/firestore";
 import { isValid } from "date-fns";
 import NoLinks from "../assets/images/no_links.svg";
@@ -45,6 +49,7 @@ export interface LinkCardProps {
   // geolocation: string;
   deleteLink: (linkDocID: string) => Promise<void>;
   copyLink: (shortUrl: string) => void;
+  customURL?: string;
 }
 
 export interface Link extends LinkCardProps {
@@ -134,9 +139,9 @@ const TopBar = ({
 
     const linksPathRef = collection(firestore, `users/${link.userID}/links`);
     const resp = await addDoc(linksPathRef, link);
-
     const linkID = resp.id;
 
+    // Add the link to the links collection
     const linksCollectionRef = collection(firestore, "links");
     const linkDocRef = doc(linksCollectionRef, link.shortCode);
     await setDoc(linkDocRef, {
@@ -165,12 +170,38 @@ const TopBar = ({
     const linksPathRef = collection(firestore, `users/${userUid}/links`);
 
     const fetchLinks = async () => {
-      const snapshot = await getDocs(linksPathRef);
+      const linksQuery = query(linksPathRef, limit(20)); // Fetch only 10 documents
+      // const querySnapshot = await getDocs(linksQuery);
+
+      // const linksQuery = query(linksPathRef);
+      const querySnapshot = await getDocs(linksQuery);
 
       const tempLinks: Link[] = [];
       let clicks = 0;
-      snapshot.forEach((doc) => {
-        const data = doc.data() as LinkCardProps;
+      querySnapshot.forEach((doc) => {
+        const { name, longURL, customURL, createdAt, totalClicks } =
+          doc.data() as {
+            name: string;
+            longURL: string;
+            customURL: string;
+            createdAt: { seconds: number; nanoseconds: number };
+            totalClicks: number;
+          };
+        const data: LinkCardProps & { customURL: string } = {
+          id: "",
+          shortCode: "",
+          description: "",
+          name,
+          longURL,
+          createdAt: new Date(
+            createdAt.seconds * 1000 + createdAt.nanoseconds / 1000000
+          ),
+          totalClicks,
+          copyLink: handleCopyLink,
+          deleteLink: handleDeleteLink,
+          customURL: customURL || "",
+        };
+
         tempLinks.push({
           ...data,
           id: doc.id,
@@ -193,14 +224,27 @@ const TopBar = ({
 
   const handleDeleteLink = useCallback(async (linkDocID: string) => {
     const { currentUser } = auth;
-    if (window.confirm("Are you sure you want to delete this link")) {
+    if (window.confirm("Are you sure you want to delete this link?")) {
       if (currentUser) {
         const userDocRef = doc(collection(firestore, "users"), currentUser.uid);
         const linkDocRef = doc(collection(userDocRef, "links"), linkDocID);
+        const linkDocSnapshot = await getDoc(linkDocRef);
+
+        if (linkDocSnapshot.exists()) {
+          const linkData = linkDocSnapshot.data();
+          const linkID = linkData?.linkID;
+          const shortCode = linkData?.shortCode;
+
+          if (linkID && shortCode) {
+            const linksCollectionRef = collection(firestore, "links");
+            const rootLinkDocRef = doc(linksCollectionRef, shortCode);
+            await deleteDoc(rootLinkDocRef);
+          }
+        }
+
         await deleteDoc(linkDocRef);
       }
       setLinks((oldLinks) => oldLinks.filter((link) => link.id !== linkDocID));
-
       setTotalLinks((prevTotalLinks) => prevTotalLinks - 1);
     }
   }, []);

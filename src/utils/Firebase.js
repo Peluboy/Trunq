@@ -1,6 +1,6 @@
 import { initializeApp } from "firebase/app";
 import { getAuth, connectAuthEmulator } from "firebase/auth";
-import { getAnalytics } from "firebase/analytics";
+import { getAnalytics, isSupported } from "firebase/analytics";
 import { connectFirestoreEmulator } from "firebase/firestore";
 import { getFirestore } from "firebase/firestore";
 
@@ -19,6 +19,12 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth();
 const firestore = getFirestore(app);
 const analytics = getAnalytics(app);
+
+// let analytics = null;
+
+// if (isSupported()) {
+//   analytics = getAnalytics(app);
+// }
 
 if (process.env.NODE_ENV === "development") {
   connectAuthEmulator(auth, "http://localhost:9099");

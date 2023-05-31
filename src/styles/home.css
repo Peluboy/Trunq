@@ -1,0 +1,24 @@
+.hero-container {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+}
+
+.header-top {
+  padding: 0.5rem 1.5rem;
+  background-color: #f4f7ff;
+  width: 260px;
+  display: flex;
+  align-items: center;
+  color: #1463ff;
+  font-weight: 500;
+  border-radius: 40px;
+}
+
+.hero-paragraph {
+  font-size: 16px;
+  line-height: 24px;
+  color: #a1a1a1;
+  font-weight: 400;
+  width: 75%;
+}

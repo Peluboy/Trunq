@@ -5,9 +5,6 @@ import { RiDeleteBin6Line } from "react-icons/ri";
 import { LinkCardProps } from "../components/TopBar";
 import format from "date-fns/format";
 import { isValid } from "date-fns";
-// import Markdown from "./Markdown";
-// import { Helmet } from "react-helmet-async";
-// import { updateOGPTags } from "../openGraphUtils";
 import { useState, useEffect, memo } from "react";
 
 const LinkCard = ({
@@ -18,6 +15,7 @@ const LinkCard = ({
   totalClicks,
   deleteLink,
   copyLink,
+  customURL,
 }: LinkCardProps) => {
   const [createdAt, setCreatedAt] = useState<Date | null>(null);
   const isMobile = useMediaQuery("(max-width: 600px)");
@@ -26,7 +24,9 @@ const LinkCard = ({
     await deleteLink(id);
   };
 
-  const shortUrl = `${window.location.host}/${shortCode}`;
+  const shortUrl = customURL
+    ? `${window.location.host}/${customURL}`
+    : `${window.location.host}/${shortCode}`;
 
   const formatCreatedAt = (createdAt: Date) => {
     if (isValid(createdAt)) {
@@ -121,6 +121,7 @@ const LinkCard = ({
             cursor="pointer"
             onClick={() => copyLink(shortUrl)}
             size={isMobile ? "18px" : "18px"}
+            data-testid="copy-link"
           />
           <RiDeleteBin6Line
             color="#a1a1a1"

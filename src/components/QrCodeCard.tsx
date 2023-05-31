@@ -22,8 +22,8 @@ const QrCodeCard = () => {
 
   const matches = useMediaQuery((theme: any) => theme.breakpoints.up("sm"));
 
-  const handleGenerateClick = () => {
-    generateQrCode();
+  const handleGenerateClick = async () => {
+    await generateQrCode();
     setGenerateButtonDisabled(true);
   };
 
