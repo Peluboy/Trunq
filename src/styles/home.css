@@ -22,3 +22,14 @@
   font-weight: 400;
   width: 75%;
 }
+
+@media (max-width: 768px) {
+  .header-top {
+    font-size: 14px;
+    width: 232px;
+    text-align: center;
+  }
+  .hero-paragraph {
+    width: 100%;
+  }
+}

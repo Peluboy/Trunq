@@ -123,17 +123,23 @@ const TopBar = ({
     const link = {
       name,
       longURL,
-      customURL,
+      shortCode: customURL || nanoid(6),
       createdAt: new Date(),
-      shortCode: customURL ? "" : nanoid(6),
+      // shortCode: "",
       totalClicks: 0,
       description: "",
       userID: auth.currentUser?.uid,
     };
 
+    if (!customURL) {
+      link.shortCode = nanoid(6);
+    }
+
     if (customURL) {
+      // If customURL is provided, use it as the shortCode
       link.shortCode = customURL;
     } else {
+      // Otherwise, generate a random shortCode
       link.shortCode = nanoid(6);
     }
 
@@ -141,7 +147,7 @@ const TopBar = ({
     const resp = await addDoc(linksPathRef, link);
     const linkID = resp.id;
 
-    // Add the link to the links collection
+    // Adding the link to the links collection
     const linksCollectionRef = collection(firestore, "links");
     const linkDocRef = doc(linksCollectionRef, link.shortCode);
     await setDoc(linkDocRef, {
@@ -156,6 +162,7 @@ const TopBar = ({
       id: linkID,
       deleteLink: handleDeleteLink,
       copyLink: handleCopyLink,
+      shortCode: link.shortCode,
     };
 
     setLinks((prevLinks) => [...prevLinks, newLink]);

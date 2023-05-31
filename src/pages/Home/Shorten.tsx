@@ -1,9 +1,17 @@
 import React from "react";
-import { Typography, Box, TextField, Button } from "@mui/material";
+import {
+  Typography,
+  Box,
+  TextField,
+  Button,
+  useMediaQuery,
+} from "@mui/material";
 import { BsArrowRight } from "react-icons/bs";
 import { IoCopyOutline } from "react-icons/io5";
 
 const Shorten = () => {
+  const isMobile = useMediaQuery("(max-width: 600px)");
+
   return (
     <>
       <Box display="flex" flexDirection="column" pb={10}>
@@ -11,9 +19,13 @@ const Shorten = () => {
           pt={8}
           px={4}
           display="flex"
-          flexDirection="row"
+          flexDirection={{ xs: "column", sm: "row" }}
           alignItems="center"
           justifyContent="space-between"
+          sx={{
+            gap: "1rem",
+            pt: "3rem",
+          }}
         >
           <Typography variant="h4" color="white">
             SHORTEN YOUR LINK NOW
@@ -24,8 +36,9 @@ const Shorten = () => {
             gap={1}
             justifyContent="flex-end"
             alignItems="center"
+            sx={{ width: { xs: "100%", sm: "auto" } }}
           >
-            <Box width="500px">
+            <Box sx={{ width: { xs: "100%", sm: "500px" }, maxWidth: "500px" }}>
               <TextField
                 name="name"
                 type="text"
@@ -35,9 +48,9 @@ const Shorten = () => {
                 size="medium"
               />
             </Box>
-            <Box>
+            <Box sx={{ width: { xs: "50%", sm: "auto" }, maxWidth: "500px" }}>
               <Button variant="contained" disableElevation size="large">
-                Shorten URL
+                {isMobile ? "Shorten" : "Shorten Url"}{" "}
                 <Box ml=".2rem" display="flex" alignItems="center">
                   <BsArrowRight />
                 </Box>
@@ -45,17 +58,22 @@ const Shorten = () => {
             </Box>
           </Box>
         </Box>
+
         <Box
           bgcolor="#444E56;"
-          p={2}
-          width="660px"
-          borderRadius={1}
-          ml="auto"
+          px={2}
+          sx={{
+            width: { xs: "83%", sm: "650px" },
+            // maxWidth: "660px",
+            borderRadius: 1,
+            ml: "auto",
+            mr: { xs: 4, sm: 4 },
+            mt: 2,
+            py: 1,
+          }}
           display="flex"
           justifyContent="space-between"
           alignItems="center"
-          mr={4}
-          mt={2}
         >
           <Typography>Short Link</Typography>
           <Button size="small" variant="text">
