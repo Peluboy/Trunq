@@ -30,7 +30,6 @@ import {
   deleteDoc,
   query,
   limit,
-  where,
 } from "firebase/firestore";
 import { isValid } from "date-fns";
 import NoLinks from "../assets/images/no_links.svg";
@@ -123,31 +122,18 @@ const TopBar = ({
     const link = {
       name,
       longURL,
-      shortCode: customURL || nanoid(6),
+      shortCode: nanoid(6),
       createdAt: new Date(),
-      // shortCode: "",
       totalClicks: 0,
       description: "",
       userID: auth.currentUser?.uid,
     };
 
-    // if (!customURL) {
-    //   link.shortCode = nanoid(6);
-    // }
-
-    if (customURL) {
-      link.shortCode = customURL;
-    } else {
+    if (!customURL || customURL.trim() === "") {
       link.shortCode = nanoid(6);
+    } else {
+      link.shortCode = customURL;
     }
-
-    // if (customURL) {
-    //   // If customURL is provided, use it as the shortCode
-    //   link.shortCode = customURL;
-    // } else {
-    //   // Otherwise, generate a random shortCode
-    //   link.shortCode = nanoid(6);
-    // }
 
     const linksPathRef = collection(firestore, `users/${link.userID}/links`);
     const resp = await addDoc(linksPathRef, link);
@@ -183,26 +169,39 @@ const TopBar = ({
     const linksPathRef = collection(firestore, `users/${userUid}/links`);
 
     const fetchLinks = async () => {
-      const linksQuery = query(linksPathRef, limit(20)); // Fetch only 10 documents
+      const linksQuery = query(linksPathRef, limit(20)); // Fetch only 20 documents
       // const querySnapshot = await getDocs(linksQuery);
 
-      // const linksQuery = query(linksPathRef);
       const querySnapshot = await getDocs(linksQuery);
 
       const tempLinks: Link[] = [];
       let clicks = 0;
       querySnapshot.forEach((doc) => {
-        const { name, longURL, customURL, createdAt, totalClicks } =
-          doc.data() as {
-            name: string;
-            longURL: string;
-            customURL: string;
-            createdAt: { seconds: number; nanoseconds: number };
-            totalClicks: number;
-          };
-        const data: LinkCardProps & { customURL: string } = {
+        const {
+          name,
+          longURL,
+          customURL,
+          createdAt,
+          totalClicks,
+          shortCode,
+        }: {
+          name: string;
+          longURL: string;
+          customURL?: string;
+          createdAt: { seconds: number; nanoseconds: number };
+          totalClicks: number;
+          shortCode: string;
+        } = doc.data() as {
+          name: string;
+          longURL: string;
+          customURL?: string;
+          createdAt: { seconds: number; nanoseconds: number };
+          totalClicks: number;
+          shortCode: string;
+        };
+        const data: LinkCardProps & { customURL?: string } = {
           id: "",
-          shortCode: "",
+          shortCode: shortCode || nanoid(6),
           description: "",
           name,
           longURL,
@@ -357,7 +356,7 @@ const TopBar = ({
                   alignItems="center"
                 >
                   <img src={NoLinks} alt="no_links" className="nolinks" />
-                  <Typography variant="h6" ml={4} mb={2}>
+                  <Typography variant="body2" ml={8} mb={2}>
                     You have no links
                   </Typography>
                 </Box>

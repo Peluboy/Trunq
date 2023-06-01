@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import "../styles/account.css";
 import {
   Button,
@@ -40,7 +40,6 @@ const ShortenURLModal = ({
   const [errors, setErrors] = useState({
     name: "",
     longUrl: "",
-    // customUrl: "",
   });
 
   const [loading, setLoading] = useState(false);
@@ -90,6 +89,12 @@ const ShortenURLModal = ({
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    return () => {
+      setCustomUrl("");
+    };
+  }, [setCustomUrl]);
 
   return (
     <Dialog open={true} onClose={handleClose} fullWidth>
@@ -150,9 +155,6 @@ const ShortenURLModal = ({
                 disabled
                 disableElevation
                 size="small"
-                // sx={{
-                //   borderRadius: "4px 0 0 4px",
-                // }}
               >
                 <Typography variant="h6">trunq.xyz/</Typography>
               </Button>
