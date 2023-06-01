@@ -131,17 +131,23 @@ const TopBar = ({
       userID: auth.currentUser?.uid,
     };
 
-    if (!customURL) {
+    // if (!customURL) {
+    //   link.shortCode = nanoid(6);
+    // }
+
+    if (customURL) {
+      link.shortCode = customURL;
+    } else {
       link.shortCode = nanoid(6);
     }
 
-    if (customURL) {
-      // If customURL is provided, use it as the shortCode
-      link.shortCode = customURL;
-    } else {
-      // Otherwise, generate a random shortCode
-      link.shortCode = nanoid(6);
-    }
+    // if (customURL) {
+    //   // If customURL is provided, use it as the shortCode
+    //   link.shortCode = customURL;
+    // } else {
+    //   // Otherwise, generate a random shortCode
+    //   link.shortCode = nanoid(6);
+    // }
 
     const linksPathRef = collection(firestore, `users/${link.userID}/links`);
     const resp = await addDoc(linksPathRef, link);
@@ -218,6 +224,10 @@ const TopBar = ({
         clicks += data.totalClicks;
       });
 
+      tempLinks.sort((prevLink, nextLink) =>
+        prevLink.createdAt > nextLink.createdAt ? -1 : 1
+      );
+
       setLinks(tempLinks);
       setTotalClicks(clicks);
       setTotalLinks(tempLinks.length);
@@ -238,11 +248,12 @@ const TopBar = ({
         const linkDocSnapshot = await getDoc(linkDocRef);
 
         if (linkDocSnapshot.exists()) {
-          const linkData = linkDocSnapshot.data();
-          const linkID = linkData?.linkID;
-          const shortCode = linkData?.shortCode;
+          const { linkID, shortCode } = linkDocSnapshot.data() as {
+            linkID?: string;
+            shortCode?: string;
+          };
 
-          if (linkID && shortCode) {
+          if (shortCode) {
             const linksCollectionRef = collection(firestore, "links");
             const rootLinkDocRef = doc(linksCollectionRef, shortCode);
             await deleteDoc(rootLinkDocRef);

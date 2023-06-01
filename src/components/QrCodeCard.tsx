@@ -32,16 +32,7 @@ const QrCodeCard = () => {
   };
 
   const handleDownloadClick = () => {
-    axios
-      .get(qrCodeResponse, {
-        responseType: "blob",
-      })
-      .then((response) => {
-        saveAs(response.data, "qrcode.png");
-      })
-      .catch((error) => {
-        console.error("Error downloading QR code:", error);
-      });
+    saveAs(qrCodeResponse, "qrcode.png");
   };
 
   useEffect(() => {

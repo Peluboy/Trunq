@@ -1,5 +1,5 @@
 import { render, screen, waitFor } from "@testing-library/react";
-import QrCodeCard from "./QrCodeCard";
+import QrCodeCard from "../components/QrCodeCard";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { toBeInTheDocument } from "@testing-library/jest-dom/matchers";
 import { saveAs } from "file-saver";

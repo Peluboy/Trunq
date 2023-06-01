@@ -1,5 +1,5 @@
 import { render } from "@testing-library/react";
-import LinkRedirect from "./LinkRedirect";
+import LinkRedirect from "../components/LinkRedirect";
 
 describe("LinkRedirect", () => {
   test("redirects to the target URL", () => {
