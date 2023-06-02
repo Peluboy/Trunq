@@ -34,6 +34,7 @@ import {
 import { isValid } from "date-fns";
 import NoLinks from "../assets/images/no_links.svg";
 import QrCodeCard from "./QrCodeCard";
+import { useNavigate } from "react-router-dom";
 // import { updateOGPTags } from "../openGraphUtils";
 
 export interface LinkCardProps {
@@ -108,6 +109,8 @@ const TopBar = ({
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
   };
+
+  const navigate = useNavigate();
 
   const handleCreateShortenLink = async (
     name: string,
@@ -237,6 +240,23 @@ const TopBar = ({
 
     fetchLinks();
   }, [auth.currentUser?.uid, links]);
+
+  useEffect(() => {
+    const handleRedirect = async () => {
+      const linkCode = window.location.pathname.substr(1);
+      const linkDocRef = doc(collection(firestore, "links"), linkCode);
+      const linkDocSnapshot = await getDoc(linkDocRef);
+
+      if (linkDocSnapshot.exists()) {
+        const { longURL } = linkDocSnapshot.data() as { longURL: string };
+        window.location.href = longURL;
+      } else {
+        // Handle invalid or non-existent shortcode
+      }
+    };
+
+    handleRedirect();
+  }, []);
 
   const handleDeleteLink = useCallback(async (linkDocID: string) => {
     const { currentUser } = auth;

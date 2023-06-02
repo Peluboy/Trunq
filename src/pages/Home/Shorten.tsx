@@ -14,10 +14,13 @@ const Shorten = () => {
 
   return (
     <>
-      <Box display="flex" flexDirection="column" pb={10}>
+      <Box
+        display="flex"
+        flexDirection="column"
+        // pb={10}
+      >
         <Box
-          pt={8}
-          px={4}
+          // pt={8}
           display="flex"
           flexDirection={{ xs: "column", sm: "row" }}
           alignItems="center"
@@ -63,11 +66,11 @@ const Shorten = () => {
           bgcolor="#444E56;"
           px={2}
           sx={{
-            width: { xs: "83%", sm: "650px" },
+            width: { xs: "100%", sm: "650px" },
             // maxWidth: "660px",
             borderRadius: 1,
             ml: "auto",
-            mr: { xs: 4, sm: 4 },
+            mr: { xs: 4, sm: 0 },
             mt: 2,
             py: 1,
           }}

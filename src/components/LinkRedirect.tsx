@@ -8,50 +8,41 @@ import {
   query,
   getDocs,
 } from "firebase/firestore";
-import { auth, firestore } from "../utils/Firebase";
+import { firestore } from "../utils/Firebase";
 import { CircularProgress, Box, Typography } from "@mui/material";
 
 const LinkRedirect = () => {
   const { shortCode } = useParams();
   const [loading, setLoading] = useState(true);
-  const [initialLoad, setInitialLoad] = useState(true);
+  const [validLink, setValidLink] = useState(false);
 
   useEffect(() => {
     const fetchLinkDoc = async () => {
-      const { currentUser } = auth;
-      if (currentUser) {
-        const userUid = currentUser.uid;
-        const linksCollectionRef = collection(
-          firestore,
-          `users/${userUid}/links`
-        );
-        const querySnapshot = await getDocs(
-          query(linksCollectionRef, where("shortCode", "==", shortCode))
-        );
+      const linksCollectionRef = collection(firestore, "links");
+      const querySnapshot = await getDocs(
+        query(linksCollectionRef, where("shortCode", "==", shortCode))
+      );
 
-        if (!querySnapshot.empty) {
-          const linkDocSnapshot = querySnapshot.docs[0];
-          const linkData = linkDocSnapshot.data();
-          const longURL = linkData.longURL;
-          console.log("Long URL:", longURL);
-          await updateDoc(linkDocSnapshot.ref, { totalClicks: increment(1) });
+      if (!querySnapshot.empty) {
+        const linkDocSnapshot = querySnapshot.docs[0];
+        const linkData = linkDocSnapshot.data();
+        const longURL = linkData.longURL;
+        console.log("Long URL:", longURL);
+        await updateDoc(linkDocSnapshot.ref, { totalClicks: increment(1) });
 
-          // Check if the longURL has a valid protocol
-          const urlPattern = /^(?:\w+:)?\/\/(\S+)$/;
+        // Check if the longURL has a valid protocol
+        const urlPattern = /^(?:\w+:)?\/\/(\S+)$/;
 
-          if (urlPattern.test(longURL)) {
-            window.location.href = longURL;
-          }
-
-          // if (urlPattern.test(longURL)) {
-          //   setTimeout(() => {
-          //     window.location.href = longURL;
-          //   }, 500); // Change the delay as desired
-          // }
+        if (urlPattern.test(longURL)) {
+          window.location.href = longURL;
+        } else {
+          window.location.href = "http://" + longURL;
         }
 
-        setLoading(false);
+        setValidLink(true);
       }
+
+      setLoading(false);
     };
 
     fetchLinkDoc();
@@ -66,7 +57,15 @@ const LinkRedirect = () => {
     );
   }
 
-  return null; // Return null when loading is false
+  if (!validLink) {
+    return (
+      <Box mt={10} textAlign="center">
+        <Typography variant="h6">Invalid link</Typography>
+      </Box>
+    );
+  }
+
+  return null; // Return null when loading is false and a valid link is found
 };
 
 export default LinkRedirect;
