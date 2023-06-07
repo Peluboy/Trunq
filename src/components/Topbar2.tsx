@@ -109,27 +109,27 @@ const TopBar2 = ({
     setValue(newValue);
   };
 
-  const generateShortCode = async () => {
+  const generateShortCode = async (longURL: string) => {
     try {
-      const response = await axios.post(
-        "https://api.rebrandly.com/v1/links",
-        {
-          // Replace with your longURL
-          domain: { fullName: "app.trunq.xyz" }, // Replace with your Rebrandly domain
+      const response = await axios.get("https://api.shrtco.de/v2/shorten", {
+        params: {
+          url: longURL,
         },
-        {
-          headers: {
-            apikey: "71a22934f225474e94a90447a9203245", // Replace with your Rebrandly API key
-          },
-        }
-      );
+      });
 
-      return response.data.shortUrl.replace("https://rebrand.ly/", "");
+      console.log("Long URL:", longURL);
+      if (response.status === 201) {
+        const { short_link: shortUrl } = response.data.result;
+        const trunqShortUrl = shortUrl.replace("shrtco.de", "trunq.xyz");
+        return trunqShortUrl;
+      } else {
+        console.error("Error generating shortcode:", response.statusText);
+      }
     } catch (error) {
-      console.error("Failed to generate shortcode:", error);
-      // Handle error
-      return null;
+      console.error("Error generating shortcode:", error);
     }
+
+    return null;
   };
 
   const handleCreateShortenLink = async (
@@ -153,7 +153,7 @@ const TopBar2 = ({
     };
 
     if (!customURL || customURL.trim() === "") {
-      link.shortCode = await generateShortCode();
+      link.shortCode = await generateShortCode(longURL);
     } else {
       link.shortCode = customURL;
     }
@@ -168,7 +168,10 @@ const TopBar2 = ({
 
     // Adding the link to the links collection
     const linksCollectionRef = collection(firestore, "links");
-    const linkDocRef = doc(linksCollectionRef, link.shortCode);
+    const linkDocRef = doc(
+      linksCollectionRef,
+      link.shortCode.replace("/", "_")
+    );
     await setDoc(linkDocRef, {
       linkID: linkID,
       longURL: link.longURL,
@@ -189,6 +192,10 @@ const TopBar2 = ({
 
     setTotalClicks((prevTotalClicks) => prevTotalClicks + 1);
     setTotalLinks((prevTotalLinks) => prevTotalLinks + 1);
+
+    const completeUrl = `https://trunq.xyz/${link.shortCode}`;
+    // window.location.replace(completeUrl);
+    window.location.href = completeUrl;
   };
 
   useEffect(() => {
@@ -278,7 +285,12 @@ const TopBar2 = ({
     if (window.confirm("Are you sure you want to delete this link?")) {
       if (currentUser) {
         const userDocRef = doc(collection(firestore, "users"), currentUser.uid);
-        const linkDocRef = doc(collection(userDocRef, "links"), linkDocID);
+        const linkDocRef = doc(
+          firestore,
+          `users/${currentUser.uid}/links`,
+          linkDocID
+        );
+
         const linkDocSnapshot = await getDoc(linkDocRef);
 
         if (linkDocSnapshot.exists()) {
@@ -289,7 +301,8 @@ const TopBar2 = ({
 
           if (shortCode) {
             const linksCollectionRef = collection(firestore, "links");
-            const rootLinkDocRef = doc(linksCollectionRef, shortCode);
+            const rootLinkDocRef = doc(linksCollectionRef, "trunq.xyz");
+            // const rootLinkDocRef = doc(linksCollectionRef, shortCode);
             await deleteDoc(rootLinkDocRef);
           }
         }
@@ -304,6 +317,7 @@ const TopBar2 = ({
   const handleCopyLink = useCallback((shortUrl: string) => {
     const completeUrl = `https://${shortUrl}`;
     copy(completeUrl);
+    // window.location.replace(completeUrl);
     setNewLinkToaster(true);
   }, []);
 

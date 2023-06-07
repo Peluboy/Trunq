@@ -99,7 +99,7 @@ const Shorten = () => {
                 variant="filled"
                 fullWidth
                 hiddenLabel
-                size="medium"
+                size="small"
                 value={longUrl}
                 onChange={(e) => setLongUrl(e.target.value)}
               />
@@ -108,7 +108,7 @@ const Shorten = () => {
               <Button
                 variant="contained"
                 disableElevation
-                size="large"
+                // size="large"
                 onClick={shortenUrl}
               >
                 {isMobile ? "Shorten" : "Shorten Url"}{" "}

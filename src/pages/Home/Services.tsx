@@ -44,7 +44,12 @@ const Services = () => {
         flexDirection={{ xs: "column", sm: "row" }}
         gap={{ xs: "2rem", sm: "2rem" }}
         p={2}
-        width={{ xs: "340px", sm: "auto" }}
+        sx={{
+          width: { xs: "340px", sm: "auto" },
+          "@media (min-width: 414px) and (max-width: 900px)": {
+            width: "365px",
+          },
+        }}
       >
         <Box width={{ xs: "100%", sm: "65%" }}>
           <Grid container spacing={2} rowGap={2} columnGap={2}>
@@ -192,10 +197,16 @@ const Services = () => {
           p={4}
           mt={-1.5}
           width={{ xs: "325px", sm: "35%" }}
+          sx={{
+            width: { xs: "325px", sm: "auto" },
+            "@media (min-width: 414px) and (max-width: 900px)": {
+              width: "345px",
+            },
+            ml: "-1rem",
+          }}
           height={{ xs: "180px", sm: "auto" }}
           borderRadius={2}
           position="relative"
-          sx={{ ml: "-1rem" }}
         >
           <img src={LogoLarge} alt="" className="ssl-image" />
           <Box

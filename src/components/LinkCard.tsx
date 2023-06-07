@@ -29,9 +29,11 @@ const LinkCard = ({
   //   ? `${window.location.host}/${customURL}`
   //   : `${window.location.host}/${shortCode}`;
 
-  const shortUrl = customURL
-    ? `trunq.xyz/${customURL}`
-    : `trunq.xyz/${shortCode}`;
+  // const shortUrl = customURL
+  //   ? `app.trunq.xyz/${customURL}`
+  //   : `trunq.xyz/${shortCode}`;
+
+  const shortUrl = customURL ? `${customURL}` : `${shortCode}`;
 
   const formatCreatedAt = (createdAt: Date) => {
     if (isValid(createdAt)) {
