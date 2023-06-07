@@ -1,8 +1,7 @@
 import { initializeApp } from "firebase/app";
 import { getAuth, connectAuthEmulator } from "firebase/auth";
 import { getAnalytics, isSupported } from "firebase/analytics";
-import { connectFirestoreEmulator } from "firebase/firestore";
-import { getFirestore } from "firebase/firestore";
+import { getFirestore, connectFirestoreEmulator } from "firebase/firestore";
 
 const firebaseConfig = {
   apiKey: process.env.REACT_APP_API_KEY,
@@ -16,21 +15,18 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
-const auth = getAuth();
+const auth = getAuth(app);
 const firestore = getFirestore(app);
-const analytics = getAnalytics(app);
 
-// let analytics = null;
+let analytics = null;
 
-// if (isSupported()) {
-//   analytics = getAnalytics(app);
-// }
+if (isSupported()) {
+  analytics = getAnalytics(app);
+}
 
 if (process.env.NODE_ENV === "development") {
   connectAuthEmulator(auth, "http://localhost:9099");
-
-  const db = getFirestore();
-  connectFirestoreEmulator(db, "localhost", 8080);
+  connectFirestoreEmulator(firestore, "localhost", 8080);
 }
 
 export { app, auth, firestore, analytics };

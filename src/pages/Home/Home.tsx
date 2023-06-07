@@ -3,6 +3,8 @@ import { Typography, Box } from "@mui/material";
 import Shorten from "./Shorten";
 import HowItWorks from "./HowItWorks";
 import Services from "./Services";
+import CallToAction from "./CallToAction";
+import Footer from "./Footer";
 
 const Home = () => {
   return (
@@ -16,6 +18,12 @@ const Home = () => {
       </Box>
       <Box bgcolor="white">
         <Services />
+      </Box>
+      <Box bgcolor="#3A414A">
+        <CallToAction />
+      </Box>
+      <Box bgcolor="white" px={4}>
+        <Footer />
       </Box>
     </>
   );

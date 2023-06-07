@@ -17,7 +17,7 @@ import { BsQrCodeScan } from "react-icons/bs";
 import { AiOutlinePlus } from "react-icons/ai";
 import LinkCard from "./LinkCard";
 import ShortenURLModal from "../components/ShortenURLModel";
-import { firestore, auth } from "../utils/Firebase";
+import { firestore, auth, analytics } from "../utils/Firebase";
 import { nanoid } from "nanoid";
 import copy from "copy-to-clipboard";
 import {
@@ -30,14 +30,11 @@ import {
   deleteDoc,
   query,
   limit,
-  updateDoc,
-  increment,
 } from "firebase/firestore";
 import { isValid } from "date-fns";
 import NoLinks from "../assets/images/no_links.svg";
 import QrCodeCard from "./QrCodeCard";
-import { useNavigate } from "react-router-dom";
-// import { updateOGPTags } from "../openGraphUtils";
+import axios from "axios";
 
 export interface LinkCardProps {
   id: string;
@@ -92,7 +89,7 @@ function a11yProps(index: number) {
   };
 }
 
-const TopBar = ({
+const TopBar2 = ({
   updateStats,
 }: {
   updateStats: (clicks: number, links: number) => void;
@@ -112,7 +109,28 @@ const TopBar = ({
     setValue(newValue);
   };
 
-  const navigate = useNavigate();
+  const generateShortCode = async () => {
+    try {
+      const response = await axios.post(
+        "https://api.rebrandly.com/v1/links",
+        {
+          // Replace with your longURL
+          domain: { fullName: "app.trunq.xyz" }, // Replace with your Rebrandly domain
+        },
+        {
+          headers: {
+            apikey: "71a22934f225474e94a90447a9203245", // Replace with your Rebrandly API key
+          },
+        }
+      );
+
+      return response.data.shortUrl.replace("https://rebrand.ly/", "");
+    } catch (error) {
+      console.error("Failed to generate shortcode:", error);
+      // Handle error
+      return null;
+    }
+  };
 
   const handleCreateShortenLink = async (
     name: string,
@@ -127,7 +145,7 @@ const TopBar = ({
     const link = {
       name,
       longURL,
-      shortCode: nanoid(6),
+      shortCode: "",
       createdAt: new Date(),
       totalClicks: 0,
       description: "",
@@ -135,9 +153,13 @@ const TopBar = ({
     };
 
     if (!customURL || customURL.trim() === "") {
-      link.shortCode = nanoid(6);
+      link.shortCode = await generateShortCode();
     } else {
       link.shortCode = customURL;
+    }
+
+    if (!link.shortCode) {
+      link.shortCode = nanoid(6);
     }
 
     const linksPathRef = collection(firestore, `users/${link.userID}/links`);
@@ -228,6 +250,14 @@ const TopBar = ({
         clicks += data.totalClicks;
       });
 
+      // Fetch the analytics data
+      const analyticsRef = collection(firestore, "analytics");
+      const analyticsSnapshot = await getDocs(analyticsRef);
+      const countries = analyticsSnapshot.docs.map((doc) => doc.id);
+
+      // Log the countries the clicks are coming from
+      //   console.log("Countries:", countries);
+
       tempLinks.sort((prevLink, nextLink) =>
         prevLink.createdAt > nextLink.createdAt ? -1 : 1
       );
@@ -242,29 +272,6 @@ const TopBar = ({
 
     fetchLinks();
   }, [auth.currentUser?.uid, links]);
-
-  // useEffect(() => {
-  //   const handleRedirect = async () => {
-  //     const linkCode = window.location.pathname.substring(1);
-  //     const linkDocRef = doc(collection(firestore, "links"), linkCode);
-  //     const linkDocSnapshot = await getDoc(linkDocRef);
-
-  //     if (linkDocSnapshot.exists()) {
-  //       const { longURL } = linkDocSnapshot.data() as { longURL: string };
-
-  //       await updateDoc(linkDocRef, { totalClicks: increment(1) }); // Update the click count
-
-  //       setTimeout(() => {
-  //         window.location.href = longURL; // Redirect to the longURL
-  //       }, 0);
-  //     } else {
-  //       // Handle invalid or non-existent shortcode
-  //       console.log("Invalid shortcode or link does not exist");
-  //     }
-  //   };
-
-  //   handleRedirect();
-  // }, []);
 
   const handleDeleteLink = useCallback(async (linkDocID: string) => {
     const { currentUser } = auth;
@@ -419,4 +426,4 @@ const TopBar = ({
   );
 };
 
-export default TopBar;
+export default TopBar2;

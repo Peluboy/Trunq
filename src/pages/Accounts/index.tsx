@@ -1,6 +1,7 @@
 import { useState } from "react";
 import Analytics from "../../components/Analytics";
-import TopBar from "../../components/TopBar";
+// import TopBar from "../../components/TopBar";
+import TopBar2 from "../../components/Topbar2";
 
 const Account = () => {
   const [totalClicks, setTotalClicks] = useState(0);
@@ -14,7 +15,8 @@ const Account = () => {
   return (
     <>
       <Analytics totalClicks={totalClicks} totalLinks={totalLinks} />
-      <TopBar updateStats={updateStats} />
+      {/* <TopBar updateStats={updateStats} /> */}
+      <TopBar2 updateStats={updateStats} />
     </>
   );
 };

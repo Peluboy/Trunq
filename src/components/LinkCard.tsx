@@ -2,7 +2,8 @@ import { Box, Typography, useMediaQuery, Tooltip } from "@mui/material";
 import { BsBarChartLine } from "react-icons/bs";
 import { IoCopyOutline } from "react-icons/io5";
 import { RiDeleteBin6Line } from "react-icons/ri";
-import { LinkCardProps } from "../components/TopBar";
+// import { LinkCardProps } from "../components/TopBar";
+import { LinkCardProps } from "../components/Topbar2";
 import format from "date-fns/format";
 import { isValid } from "date-fns";
 import { useState, useEffect, memo } from "react";
@@ -24,9 +25,13 @@ const LinkCard = ({
     await deleteLink(id);
   };
 
+  // const shortUrl = customURL
+  //   ? `${window.location.host}/${customURL}`
+  //   : `${window.location.host}/${shortCode}`;
+
   const shortUrl = customURL
-    ? `${window.location.host}/${customURL}`
-    : `${window.location.host}/${shortCode}`;
+    ? `trunq.xyz/${customURL}`
+    : `trunq.xyz/${shortCode}`;
 
   const formatCreatedAt = (createdAt: Date) => {
     if (isValid(createdAt)) {

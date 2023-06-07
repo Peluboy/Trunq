@@ -58,11 +58,37 @@ p {
 }
 
 .ssl-paragraph {
-  padding-top: 5rem;
+  /* padding-top: 5rem; */
   color: white;
+  width: 80%;
   font-size: 1.8rem;
   font-weight: 500;
   line-height: 2rem;
+}
+
+.CTO-top p {
+  color: white;
+}
+
+a {
+  text-decoration: none;
+  color: #a1a1a1;
+  font-weight: 400;
+  font-size: 14px;
+}
+
+.footer-img {
+  width: 20%;
+  padding-bottom: 1rem;
+}
+
+@media (max-width: 980px) {
+  .ssl-paragraph {
+    /* padding-top: 4rem; */
+    font-size: 1.5rem;
+    width: 100%;
+    line-height: 1.6rem;
+  }
 }
 
 @media (max-width: 768px) {
@@ -80,8 +106,14 @@ p {
   }
 
   .ssl-paragraph {
-    padding-top: 4rem;
+    /* padding-top: 4rem; */
+    width: 80%;
     font-size: 1.5rem;
     line-height: 1.6rem;
+  }
+
+  .footer-img {
+    width: 40%;
+    padding-bottom: 1rem;
   }
 }

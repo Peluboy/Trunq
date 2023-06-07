@@ -4,6 +4,8 @@ import { AiOutlineUsergroupAdd } from "react-icons/ai";
 import { AiOutlineLink } from "react-icons/ai";
 import { BiBarChartSquare } from "react-icons/bi";
 import { BiServer } from "react-icons/bi";
+import { GiPadlock } from "react-icons/gi";
+
 import LogoLarge from "../../assets/images/logo-large.svg";
 
 const Services = () => {
@@ -52,9 +54,10 @@ const Services = () => {
               sm={5.8}
               bgcolor=" #F6F6F6"
               borderRadius={2}
-              p={3}
+              p="16px"
               height="100px"
               display="flex"
+              justifyContent="center"
               alignItems="center"
             >
               <Box
@@ -86,7 +89,7 @@ const Services = () => {
               sm={5.8}
               bgcolor=" #F6F6F6"
               borderRadius={2}
-              p={3}
+              p="16px"
               height="100px"
               display="flex"
               alignItems="center"
@@ -120,7 +123,7 @@ const Services = () => {
               sm={5.8}
               bgcolor=" #F6F6F6"
               borderRadius={2}
-              p={3}
+              p="16px"
               height="100px"
               display="flex"
               alignItems="center"
@@ -154,7 +157,7 @@ const Services = () => {
               sm={5.8}
               bgcolor=" #F6F6F6"
               borderRadius={2}
-              p={3}
+              p="16px"
               height="100px"
               display="flex"
               alignItems="center"
@@ -195,10 +198,27 @@ const Services = () => {
           sx={{ ml: "-1rem" }}
         >
           <img src={LogoLarge} alt="" className="ssl-image" />
-          <p className="ssl-paragraph">
-            SSL and redirection <br />
-            url with no worries
-          </p>
+          <Box
+            display="flex"
+            flexDirection="column"
+            justifyContent="space-between"
+            height="100%"
+          >
+            <Box
+              height="30px"
+              width="30px"
+              borderRadius="50%"
+              bgcolor="white"
+              display="flex"
+              alignItems="center"
+              justifyContent="center"
+            >
+              <GiPadlock color="#1463FF" />
+            </Box>
+            <p className="ssl-paragraph">
+              SSL and redirection url with no worries
+            </p>
+          </Box>
         </Box>
       </Box>
     </Box>

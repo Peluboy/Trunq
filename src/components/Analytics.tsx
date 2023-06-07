@@ -1,12 +1,11 @@
+import { useState, useEffect } from "react";
 import { Box, Typography, Grid } from "@mui/material";
 import "../styles/account.css";
-import {
-  AiOutlineLink,
-  AiOutlineEye,
-  AiOutlinePieChart,
-  AiOutlineClockCircle,
-} from "react-icons/ai";
+import { AiOutlineLink, AiOutlineClockCircle } from "react-icons/ai";
 import { TbHandClick } from "react-icons/tb";
+import { IoLocationOutline } from "react-icons/io5";
+import { collection, getDocs } from "firebase/firestore";
+import { firestore } from "../utils/Firebase";
 
 export interface AnalyticsProps {
   totalClicks: number;
@@ -14,6 +13,26 @@ export interface AnalyticsProps {
 }
 
 const Analytics = ({ totalClicks, totalLinks }: AnalyticsProps) => {
+  const [topLocation, setTopLocation] = useState("Nigeria"); // State variable to hold the top location value
+
+  useEffect(() => {
+    const fetchTopLocation = async () => {
+      try {
+        const analyticsRef = collection(firestore, "analytics");
+        const analyticsSnapshot = await getDocs(analyticsRef);
+        const countries = analyticsSnapshot.docs.map((doc) => doc.id);
+
+        if (countries.length > 0) {
+          setTopLocation(countries[0]); // Assuming the first country in the list is the top one
+        }
+      } catch (error) {
+        console.error("Error fetching top location:", error);
+      }
+    };
+
+    fetchTopLocation();
+  }, []);
+
   return (
     <Grid container justifyContent="center">
       <Grid item xs={12} sm={8}>
@@ -63,12 +82,12 @@ const Analytics = ({ totalClicks, totalLinks }: AnalyticsProps) => {
             <Box display="flex" flexDirection="column">
               <Box display="flex" alignContent="flex-start">
                 <Box pt=".2rem" mr=".8rem">
-                  <AiOutlineClockCircle size="18px" color="#A1A1A1" />
+                  <IoLocationOutline size="18px" color="#A1A1A1" />
                 </Box>
-                <Typography variant="h4">6.37s</Typography>
+                <Typography variant="h4">{topLocation}</Typography>
               </Box>
               <Box ml="2rem">
-                <Typography variant="body2">Avg. Time</Typography>
+                <Typography variant="body2">Top Location</Typography>
               </Box>
             </Box>
           </Box>

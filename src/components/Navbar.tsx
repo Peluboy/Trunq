@@ -2,12 +2,13 @@ import { AppBar, Toolbar, Button, Box } from "@mui/material";
 import TrunqLogo from "../assets/images/trunqLogo.svg";
 import "../styles/account.css";
 import { auth } from "../utils/Firebase";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
 import AuthModal from "./AuthModal";
 
 const Navbar = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [isLoggedIn, setIsLoggedIn] = useState(!!auth.currentUser);
   const [openAuthModal, setOpenAuthModal] = useState(false);
 
@@ -26,6 +27,13 @@ const Navbar = () => {
       unsubscribe();
     };
   }, []);
+
+  // Check if the current location matches the redirect route
+  const isRedirecting = location.pathname === "/redirect/:shortCode";
+
+  if (isRedirecting) {
+    return null; // Return null to hide the navbar during redirection
+  }
 
   return (
     <>

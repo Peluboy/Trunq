@@ -7,6 +7,8 @@ import {
   where,
   query,
   getDocs,
+  getDoc,
+  doc,
 } from "firebase/firestore";
 import { firestore } from "../utils/Firebase";
 import { CircularProgress, Box, Typography } from "@mui/material";
@@ -34,9 +36,13 @@ const LinkRedirect = () => {
         const urlPattern = /^(?:\w+:)?\/\/(\S+)$/;
 
         if (urlPattern.test(longURL)) {
-          window.location.href = longURL;
+          setTimeout(() => {
+            window.location.href = longURL;
+          }, 1000); // Delay the redirection by 500 milliseconds
         } else {
-          window.location.href = "http://" + longURL;
+          setTimeout(() => {
+            window.location.href = "http://" + longURL;
+          }, 1000); // Delay the redirection by 500 milliseconds
         }
 
         setValidLink(true);
@@ -47,6 +53,35 @@ const LinkRedirect = () => {
 
     fetchLinkDoc();
   }, [shortCode]);
+
+  // useEffect(() => {
+  //   const handleRedirect = async () => {
+  //     const linkCode = window.location.pathname.substring(1);
+  //     const linkDocRef = doc(collection(firestore, "links"), linkCode);
+
+  //     try {
+  //       const linkDocSnapshot = await getDoc(linkDocRef);
+
+  //       if (linkDocSnapshot.exists()) {
+  //         const { longURL } = linkDocSnapshot.data() as { longURL: string };
+
+  //         await updateDoc(linkDocRef, { totalClicks: increment(1) }); // Update the click count
+
+  //         setTimeout(() => {
+  //           window.location.href = longURL; // Redirect to the longURL
+  //         }, 0);
+  //       } else {
+  //         // Handle invalid or non-existent shortcode
+  //         console.log("Invalid shortcode or link does not exist");
+  //       }
+  //     } catch (error) {
+  //       // Handle any errors that occur during the retrieval or redirection
+  //       console.error("Error occurred during link redirection:", error);
+  //     }
+  //   };
+
+  //   handleRedirect();
+  // }, []);
 
   if (loading) {
     return (
@@ -60,7 +95,7 @@ const LinkRedirect = () => {
   if (!validLink) {
     return (
       <Box mt={10} textAlign="center">
-        <Typography variant="h6">Invalid link</Typography>
+        <Typography>Invalid link</Typography>
       </Box>
     );
   }
