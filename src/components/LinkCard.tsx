@@ -56,26 +56,18 @@ const LinkCard = ({
     }
   }, [id]);
 
-  useEffect(() => {
-    // Update the document title dynamically
-    const updateDocumentTitle = () => {
-      if (longURL) {
-        document.title = `${name} - ${longURL}`;
-      }
-    };
+  // useEffect(() => {
+  //   const updateDocumentTitle = () => {
+  //     if (longURL) {
+  //       document.title = `${name} - ${longURL}`;
+  //     }
+  //   };
 
-    updateDocumentTitle();
-  }, [longURL, name]);
+  //   updateDocumentTitle();
+  // }, [longURL, name]);
 
   return (
     <>
-      {/* <Helmet>
-        {updateOGPTags(name, longURL, shortCode).map(
-          ({ property, content }) => (
-            <meta key={property} property={property} content={content} />
-          )
-        )}
-      </Helmet> */}
       <Box
         display="flex"
         justifyContent="space-between"
@@ -138,7 +130,6 @@ const LinkCard = ({
           />
         </Box>
       </Box>
-      {/* <Markdown shortcode={shortCode} /> */}
     </>
   );
 };

@@ -30,6 +30,8 @@ import {
   deleteDoc,
   query,
   limit,
+  updateDoc,
+  increment,
 } from "firebase/firestore";
 import { isValid } from "date-fns";
 import NoLinks from "../assets/images/no_links.svg";
@@ -109,19 +111,18 @@ const TopBar2 = ({
     setValue(newValue);
   };
 
-  const generateShortCode = async (longURL: string) => {
+  const generateShortCode = async (longURL: string, customURL?: string) => {
     try {
-      const response = await axios.get("https://api.shrtco.de/v2/shorten", {
-        params: {
-          url: longURL,
-        },
-      });
+      const apiUrl = customURL
+        ? `https://api.shrtco.de/v2/shorten?url=${longURL}&custom_code=${customURL}`
+        : `https://api.shrtco.de/v2/shorten?url=${longURL}`;
 
-      console.log("Long URL:", longURL);
+      const response = await axios.get(apiUrl);
+
+      // console.log("Long URL:", longURL);
       if (response.status === 201) {
         const { short_link: shortUrl } = response.data.result;
-        const trunqShortUrl = shortUrl.replace("shrtco.de", "trunq.xyz");
-        return trunqShortUrl;
+        return shortUrl;
       } else {
         console.error("Error generating shortcode:", response.statusText);
       }
@@ -129,7 +130,7 @@ const TopBar2 = ({
       console.error("Error generating shortcode:", error);
     }
 
-    return null;
+    return "";
   };
 
   const handleCreateShortenLink = async (
@@ -155,7 +156,7 @@ const TopBar2 = ({
     if (!customURL || customURL.trim() === "") {
       link.shortCode = await generateShortCode(longURL);
     } else {
-      link.shortCode = customURL;
+      link.shortCode = await generateShortCode(longURL, customURL);
     }
 
     if (!link.shortCode) {
@@ -187,15 +188,17 @@ const TopBar2 = ({
       shortCode: link.shortCode,
     };
 
+    await updateDoc(linkDocRef, {
+      totalClicks: increment(1),
+    });
+
     setLinks((prevLinks) => [...prevLinks, newLink]);
     setOpenModal(false);
 
     setTotalClicks((prevTotalClicks) => prevTotalClicks + 1);
     setTotalLinks((prevTotalLinks) => prevTotalLinks + 1);
 
-    const completeUrl = `https://trunq.xyz/${link.shortCode}`;
-    // window.location.replace(completeUrl);
-    window.location.href = completeUrl;
+    const completeUrl = await generateShortCode(longURL);
   };
 
   useEffect(() => {
@@ -301,8 +304,8 @@ const TopBar2 = ({
 
           if (shortCode) {
             const linksCollectionRef = collection(firestore, "links");
-            const rootLinkDocRef = doc(linksCollectionRef, "trunq.xyz");
-            // const rootLinkDocRef = doc(linksCollectionRef, shortCode);
+            // const rootLinkDocRef = doc(linksCollectionRef, "shrtco.de");
+            const rootLinkDocRef = doc(linksCollectionRef, shortCode);
             await deleteDoc(rootLinkDocRef);
           }
         }

@@ -5,6 +5,7 @@ import { auth } from "../utils/Firebase";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
 import AuthModal from "./AuthModal";
+import { Link } from "react-router-dom";
 
 const Navbar = () => {
   const navigate = useNavigate();
@@ -40,7 +41,9 @@ const Navbar = () => {
       {openAuthModal && <AuthModal onClose={() => setOpenAuthModal(false)} />}
       <AppBar position="static" color="secondary" elevation={0}>
         <Toolbar>
-          <img src={TrunqLogo} alt="" className="trunq-logo" />
+          <Link to="/">
+            <img src={TrunqLogo} alt="" className="trunq-logo" />
+          </Link>
           <Box ml="auto" display="flex">
             {isLoggedIn ? (
               <>

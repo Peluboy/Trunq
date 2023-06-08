@@ -10,6 +10,7 @@ import {
 import { BsArrowRight } from "react-icons/bs";
 import { IoCopyOutline } from "react-icons/io5";
 import { nanoid } from "nanoid";
+import axios from "axios";
 
 const Shorten = () => {
   const isMobile = useMediaQuery("(max-width: 600px)");
@@ -19,42 +20,26 @@ const Shorten = () => {
   const [longUrlName, setLongUrlName] = useState("");
   const [longUrlDescription, setLongUrlDescription] = useState("");
 
-  const shortenUrl = async () => {
+  const generateShortCode = async (longURL: string, customURL?: string) => {
     try {
-      const apiKey = "71a22934f225474e94a90447a9203245";
-      const domainId = "9fcbd290ea844b8ebb077f2af57c86dd";
-      const shortcode = nanoid(6);
+      const apiUrl = customURL
+        ? `https://api.shrtco.de/v2/shorten?url=${longURL}&custom_code=${customURL}`
+        : `https://api.shrtco.de/v2/shorten?url=${longURL}`;
 
-      const response = await fetch("https://api.rebrandly.com/v1/links", {
-        method: "POST",
-        headers: {
-          apikey: apiKey,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          destination: longUrl,
-          domain: { id: domainId },
-          slashtag: shortcode,
-        }),
-      });
+      const response = await axios.get(apiUrl);
 
-      if (response.ok) {
-        const data = await response.json();
-        // const { shortUrl } = data;
-
-        const { shortUrl, destinationName, destinationDescription } = data;
-
+      if (response.status === 201) {
+        const { short_link: shortUrl } = response.data.result;
         setShortLink(shortUrl);
-        setLongUrlName(destinationName);
-        setLongUrlDescription(destinationDescription);
-
-        setShortLink(shortUrl);
+        return shortUrl;
       } else {
-        console.error("Error shortening URL:", response.statusText);
+        console.error("Error generating shortcode:", response.statusText);
       }
     } catch (error) {
-      console.error("Error shortening URL:", error);
+      console.error("Error generating shortcode:", error);
     }
+
+    return "";
   };
 
   const copyToClipboard = () => {
@@ -109,7 +94,7 @@ const Shorten = () => {
                 variant="contained"
                 disableElevation
                 // size="large"
-                onClick={shortenUrl}
+                onClick={() => generateShortCode(longUrl)}
               >
                 {isMobile ? "Shorten" : "Shorten Url"}{" "}
                 <Box ml=".2rem" display="flex" alignItems="center">

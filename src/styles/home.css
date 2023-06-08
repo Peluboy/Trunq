@@ -82,6 +82,15 @@ a {
   padding-bottom: 1rem;
 }
 
+.css-11w6z0g-MuiStepLabel-label.Mui-active {
+  color: #ffffffde !important;
+  font-weight: 500;
+}
+
+.css-k4qjio-MuiFormHelperText-root.Mui-error {
+  margin-left: 0 !important;
+}
+
 @media (max-width: 980px) {
   .ssl-paragraph {
     /* padding-top: 4rem; */

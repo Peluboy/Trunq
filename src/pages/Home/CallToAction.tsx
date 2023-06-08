@@ -31,13 +31,15 @@ const CallToAction = () => {
           >
             GET CLOSER TO YOUR CUSTOMERS TODAY
           </Typography>
-          <Button
-            variant="contained"
-            disableElevation
-            onClick={() => setOpenAuthModal(true)}
-          >
-            Get Started for Free
-          </Button>
+          <Box>
+            <Button
+              variant="contained"
+              disableElevation
+              onClick={() => setOpenAuthModal(true)}
+            >
+              Get Started for Free
+            </Button>
+          </Box>
         </Box>
         <Box></Box>
       </Box>

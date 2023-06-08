@@ -58,7 +58,7 @@ export default function HorizontalNonLinearStepper() {
           pb={6}
           display="flex"
           flexDirection={{ xs: "column", sm: "row" }}
-          alignItems="center"
+          // alignItems="center"
           justifyContent="space-between"
           sx={{
             gap: "1.5rem",
@@ -89,7 +89,7 @@ export default function HorizontalNonLinearStepper() {
             {steps.map((label, index) => (
               <Step key={label} completed={completed[index]}>
                 <StepButton
-                  color="inherit"
+                  color={index === activeStep ? "white" : "white"}
                   onClick={handleStep(index)}
                   className="stepButton"
                 >

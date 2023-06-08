@@ -8,6 +8,7 @@ import {
   Typography,
   TextField,
   CircularProgress,
+  InputAdornment,
 } from "@mui/material";
 import { auth } from "../utils/Firebase";
 import {
@@ -15,6 +16,8 @@ import {
   signInWithEmailAndPassword,
 } from "firebase/auth";
 import { GrClose } from "react-icons/gr";
+import { MdVisibility, MdVisibilityOff } from "react-icons/md";
+import isEmail from "validator/lib/isEmail";
 
 type AuthModalProps = {
   onClose: (
@@ -26,11 +29,21 @@ type AuthModalProps = {
 const AuthModal = ({ onClose }: AuthModalProps) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [isSignIn, setIsSignIn] = useState(true);
+  const [emailError, setEmailError] = useState("");
+  const [passwordError, setPasswordError] = useState("");
+  const [firebaseError, setFirebaseError] = useState("");
+  const [isForgetPassword, setIsForgetPassword] = useState(false);
+
   const [form, setForm] = useState({
     email: "",
     password: "",
   });
+
+  const togglePasswordVisibility = () => {
+    setShowPassword((prevShowPassword) => !prevShowPassword);
+  };
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) =>
     setForm((oldform) => ({
@@ -40,14 +53,17 @@ const AuthModal = ({ onClose }: AuthModalProps) => {
 
   const handleAuth = async () => {
     setLoading(true);
+    setEmailError(""); // Clear the email error
+    setPasswordError(""); // Clear the password error
+    setFirebaseError("");
     try {
       if (isSignIn) {
         await signInWithEmailAndPassword(auth, form.email, form.password);
         onClose({}, "success");
       } else {
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(form.email)) {
-          setError("Invalid email");
+        if (!isEmail(form.email)) {
+          setEmailError("Invalid email");
+          setLoading(false);
           return;
         }
 
@@ -58,16 +74,22 @@ const AuthModal = ({ onClose }: AuthModalProps) => {
       let errorMessage = "";
       switch (error.code) {
         case "auth/email-already-in-use":
-          errorMessage = "Email already in use";
+          setEmailError("Email already in use");
           break;
         case "auth/invalid-email":
-          errorMessage = "Invalid email";
+          setEmailError("Invalid email");
+          break;
+        case "auth/user-not-found":
+          setEmailError("No account found with this email");
+          break;
+        case "auth/wrong-password":
+          setPasswordError("Wrong password, Try again");
           break;
         default:
           errorMessage = error.message;
           break;
       }
-      setError(errorMessage);
+      setFirebaseError(errorMessage);
       setLoading(false);
     }
   };
@@ -107,6 +129,8 @@ const AuthModal = ({ onClose }: AuthModalProps) => {
               variant="outlined"
               required
               size="small"
+              error={!!emailError}
+              helperText={emailError || ""}
             >
               Email
             </TextField>
@@ -114,21 +138,39 @@ const AuthModal = ({ onClose }: AuthModalProps) => {
           <Box display="flex" flexDirection="column">
             <Typography variant="overline">Password</Typography>
             <TextField
-              type="password"
+              type={showPassword ? "text" : "password"}
               value={form.password}
               name="password"
               onChange={handleChange}
-              // label="Password"
-              size="small"
               variant="outlined"
               required
-            >
-              Password
-            </TextField>
+              size="small"
+              error={!!passwordError}
+              helperText={passwordError || ""}
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    {showPassword ? (
+                      <MdVisibilityOff
+                        onClick={togglePasswordVisibility}
+                        style={{ cursor: "pointer" }}
+                        size="1rem"
+                      />
+                    ) : (
+                      <MdVisibility
+                        onClick={togglePasswordVisibility}
+                        style={{ cursor: "pointer" }}
+                        size="1rem"
+                      />
+                    )}
+                  </InputAdornment>
+                ),
+              }}
+            />
           </Box>
         </Box>
         <Box color="red" mt={2}>
-          <Typography>{error}</Typography>
+          {/* <Typography>{emailError || error}</Typography> */}
         </Box>
       </DialogContent>
       <DialogActions>
