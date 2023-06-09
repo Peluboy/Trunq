@@ -47,10 +47,20 @@ p {
 }
 
 .terms-condition {
-  color: #767676;
+  color: #171d23;
   font-size: 11px;
   font-weight: 500;
   text-transform: uppercase;
+  font-family: "Roboto", "Helvetica", "Arial", sans-serif;
+  letter-spacing: 0.08333em;
+}
+
+.forgot-password-paragraph {
+  color: #171d23;
+  font-size: 11px;
+  font-weight: 500;
+  text-transform: uppercase;
+  text-decoration: underline;
   font-family: "Roboto", "Helvetica", "Arial", sans-serif;
   letter-spacing: 0.08333em;
 }
@@ -157,7 +167,16 @@ a {
   }
 
   .terms-condition {
-    color: #767676;
+    color: #171d23;
+    font-size: 10px;
+    font-weight: 500;
+    text-transform: uppercase;
+    font-family: "Roboto", "Helvetica", "Arial", sans-serif;
+    letter-spacing: 0.02em;
+  }
+
+  .forgot-password-paragraph {
+    color: #171d23;
     font-size: 10px;
     font-weight: 500;
     text-transform: uppercase;

@@ -99,6 +99,21 @@ export default function AuthContextProvider({ children }) {
   function forgotPassword(email) {
     return sendPasswordResetEmail(auth, email, {
       url: `http://localhost:3000/home`,
+    }).catch((error) => {
+      let errorMessage = "";
+      let errorCode = "";
+
+      switch (error.code) {
+        case "auth/user-not-found":
+          errorCode = "user-not-found";
+          errorMessage = "No account found with this email";
+          break;
+        default:
+          errorMessage = error.message;
+          break;
+      }
+
+      throw { code: errorCode, message: errorMessage };
     });
   }
 

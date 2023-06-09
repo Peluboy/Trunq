@@ -100,6 +100,7 @@ const AuthModal = ({ onClose }: AuthModalProps) => {
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
   const [firebaseError, setFirebaseError] = useState("");
+  const [isCheckboxChecked, setIsCheckboxChecked] = useState(false);
 
   const [form, setForm] = useState({
     email: "",
@@ -160,6 +161,29 @@ const AuthModal = ({ onClose }: AuthModalProps) => {
     }
   };
 
+  const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setIsCheckboxChecked(event.target.checked);
+  };
+
+  const isFormValid = form.email !== "" && form.password !== "";
+
+  const resetForm = () => {
+    setForm({
+      email: "",
+      password: "",
+    });
+    setEmailError("");
+    setPasswordError("");
+    setFirebaseError("");
+    setIsCheckboxChecked(false);
+  };
+
+  const handleToggleMode = () => {
+    // setIsSignIn((prevState) => !prevState);
+    setIsSignIn((o) => !o);
+    resetForm();
+  };
+
   return (
     <Dialog open fullWidth onClose={onClose}>
       <Box
@@ -168,9 +192,9 @@ const AuthModal = ({ onClose }: AuthModalProps) => {
         justifyContent="space-between"
         alignItems="center"
       >
-        <Box pl={3} pt={3} pb={0.5}>
+        <Box pl={3} pt={3}>
           <Typography variant="h5">
-            {isSignIn ? "Welcome back!" : "Get Started!"}
+            {isSignIn ? "Welcome back😁" : "Get Started🎉"}
           </Typography>
         </Box>
 
@@ -191,7 +215,6 @@ const AuthModal = ({ onClose }: AuthModalProps) => {
               value={form.email}
               name="email"
               onChange={handleChange}
-              // label="Email"
               variant="outlined"
               required
               size="small"
@@ -239,10 +262,10 @@ const AuthModal = ({ onClose }: AuthModalProps) => {
           <Box mt={2} display="flex" justifyContent="flex-start">
             <Link to="/forgot-password" style={{ cursor: "pointer" }}>
               <p
-                className="terms-condition"
+                className="forgot-password-paragraph"
                 onClick={() => onClose({}, "backdropClick")}
               >
-                Forgot Password?
+                Forgot Password
               </p>
             </Link>
           </Box>
@@ -250,7 +273,10 @@ const AuthModal = ({ onClose }: AuthModalProps) => {
         {!isSignIn && (
           <Box mt={2} display="flex" justifyContent="flex-start">
             <Box display="flex" alignItems="center">
-              <BpCheckbox />
+              <BpCheckbox
+                checked={isCheckboxChecked}
+                onChange={handleCheckboxChange}
+              />
               <p className="terms-condition">
                 I agree to Trunq's Privacy and Terms of Use.
               </p>
@@ -267,9 +293,13 @@ const AuthModal = ({ onClose }: AuthModalProps) => {
           mb={1}
           mx={2}
         >
-          <Button>
-            <Typography onClick={() => setIsSignIn((o) => !o)} variant="body2">
-              {isSignIn ? "Don't have an account?" : "Already have an account"}
+          <Button variant="outlined">
+            <Typography
+              onClick={handleToggleMode}
+              variant="body2"
+              color="inherit"
+            >
+              {isSignIn ? "Don't have an account?" : "Already have an account?"}
             </Typography>
           </Button>
           <Button
@@ -278,7 +308,9 @@ const AuthModal = ({ onClose }: AuthModalProps) => {
             disableElevation
             autoFocus
             color="primary"
-            disabled={loading}
+            disabled={
+              loading || !isFormValid || (!isSignIn && !isCheckboxChecked)
+            }
           >
             {loading ? (
               <CircularProgress size={20} color="inherit" />

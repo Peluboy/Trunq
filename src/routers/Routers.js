@@ -1,16 +1,16 @@
 import { useState, useEffect } from "react";
-import { Routes, Route, Navigate, useLocation } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import Home from "../pages/Home/Home";
 import Account from "../pages/Accounts";
 import { auth } from "../utils/Firebase";
 import { Box, CircularProgress } from "@mui/material";
 import LinkRedirect from "../components/LinkRedirect";
-import ForgetPassowrd from "../components/ForgetPassowrd";
-import ResetPassword from "../components/ResetPassword";
+import ForgetPassowrd from "../pages/ForgetPassowrd";
+import ResetPassword from "../pages/ResetPassword";
+import ErrorPage from "../pages/ErrorPage";
 
 const Routers = () => {
   const [user, setUser] = useState(null);
-  const { pathname } = useLocation();
   const [initialLoad, setInitialLoad] = useState(true);
 
   useEffect(() => {
@@ -39,9 +39,10 @@ const Routers = () => {
         path="/dashboard"
         element={user ? <Account /> : <Navigate to="/home" />}
       />
-      <Route path="/:shortCode" element={<LinkRedirect />} />
+      {/* <Route path="/:shortCode" element={<LinkRedirect />} /> */}
       <Route path="/forgot-password" element={<ForgetPassowrd />} />
       <Route path="/reset-password" element={<ResetPassword />} />
+      <Route path="*" element={<ErrorPage />} />
     </Routes>
   );
 };

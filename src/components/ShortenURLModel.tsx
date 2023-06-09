@@ -182,7 +182,7 @@ const ShortenURLModal = ({
             disableElevation
             autoFocus
             color="primary"
-            disabled={loading}
+            disabled={loading || !form.name || !form.longUrl}
           >
             {loading ? (
               <CircularProgress size={20} color="inherit" />

@@ -9,20 +9,20 @@ import Footer from "./Footer";
 const Home = () => {
   return (
     <>
-      <Box bgcolor="white">
+      <Box bgcolor="white" sx={{ overflowX: "hidden" }}>
         <Hero />
       </Box>
-      <Box bgcolor="#3A414A" px={4} pb={5}>
+      <Box bgcolor="#3A414A" px={4} pb={5} sx={{ overflowX: "hidden" }}>
         <Shorten />
         <HowItWorks />
       </Box>
-      <Box bgcolor="white">
+      <Box bgcolor="white" sx={{ overflowX: "hidden" }}>
         <Services />
       </Box>
-      <Box bgcolor="#3A414A">
+      <Box bgcolor="#3A414A" sx={{ overflowX: "hidden" }}>
         <CallToAction />
       </Box>
-      <Box bgcolor="white" px={4}>
+      <Box bgcolor="white" px={4} sx={{ overflowX: "hidden" }}>
         <Footer />
       </Box>
     </>

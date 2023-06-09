@@ -26,9 +26,18 @@ export const theme = createTheme({
   },
   typography: {
     // fontFamily: "Stagnan, sans-serif",
+    h1: {
+      color: "#1D2A36",
+      fontFamily: "Stagnan, sans-serif",
+    },
     h2: {
       color: "#1D2A36",
       fontWeight: 700,
+      fontFamily: "Stagnan, sans-serif",
+    },
+    h3: {
+      color: "#1D2A36",
+      textTransform: "uppercase",
       fontFamily: "Stagnan, sans-serif",
     },
     h4: {
