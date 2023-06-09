@@ -56,16 +56,6 @@ const LinkCard = ({
     }
   }, [id]);
 
-  // useEffect(() => {
-  //   const updateDocumentTitle = () => {
-  //     if (longURL) {
-  //       document.title = `${name} - ${longURL}`;
-  //     }
-  //   };
-
-  //   updateDocumentTitle();
-  // }, [longURL, name]);
-
   return (
     <>
       <Box

@@ -46,6 +46,15 @@ p {
   font-weight: 400;
 }
 
+.terms-condition {
+  color: #767676;
+  font-size: 11px;
+  font-weight: 500;
+  text-transform: uppercase;
+  font-family: "Roboto", "Helvetica", "Arial", sans-serif;
+  letter-spacing: 0.08333em;
+}
+
 /* .serviceGridContainer > .MuiGrid-item {
   margin-bottom: 16px;
   margin-right: 16px;
@@ -82,6 +91,23 @@ a {
   padding-bottom: 1rem;
 }
 
+.forget-password-container {
+  display: flex;
+  height: 80vh;
+  justify-content: center;
+  align-items: center;
+  margin: auto;
+}
+
+.forget-password {
+  background-color: white;
+  padding: 2rem;
+  justify-content: center;
+  display: flex;
+  width: 300px;
+  border-radius: 0.5rem;
+}
+
 .css-11w6z0g-MuiStepLabel-label.Mui-active {
   color: #ffffffde !important;
   font-weight: 500;
@@ -89,6 +115,10 @@ a {
 
 .css-k4qjio-MuiFormHelperText-root.Mui-error {
   margin-left: 0 !important;
+}
+
+.css-cdzivs-MuiButtonBase-root-MuiCheckbox-root {
+  padding: 0 9px 0 0 !important;
 }
 
 @media (max-width: 980px) {
@@ -124,5 +154,14 @@ a {
   .footer-img {
     width: 40%;
     padding-bottom: 1rem;
+  }
+
+  .terms-condition {
+    color: #767676;
+    font-size: 10px;
+    font-weight: 500;
+    text-transform: uppercase;
+    font-family: "Roboto", "Helvetica", "Arial", sans-serif;
+    letter-spacing: 0.02em;
   }
 }

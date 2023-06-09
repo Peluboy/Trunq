@@ -5,6 +5,8 @@ import Account from "../pages/Accounts";
 import { auth } from "../utils/Firebase";
 import { Box, CircularProgress } from "@mui/material";
 import LinkRedirect from "../components/LinkRedirect";
+import ForgetPassowrd from "../components/ForgetPassowrd";
+import ResetPassword from "../components/ResetPassword";
 
 const Routers = () => {
   const [user, setUser] = useState(null);
@@ -38,6 +40,8 @@ const Routers = () => {
         element={user ? <Account /> : <Navigate to="/home" />}
       />
       <Route path="/:shortCode" element={<LinkRedirect />} />
+      <Route path="/forgot-password" element={<ForgetPassowrd />} />
+      <Route path="/reset-password" element={<ResetPassword />} />
     </Routes>
   );
 };

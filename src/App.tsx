@@ -5,6 +5,8 @@ import { theme } from "./theme";
 import QrCodeProvider from "./contexts/QrCodeProvider";
 import { ErrorBoundary } from "./components/ErrorBoundary/ErrorBoundary";
 import { HelmetProvider } from "react-helmet-async";
+import AuthContextProvider from "./contexts/AuthContext";
+// import { AuthProvider } from "./contexts/AuthProvider";
 
 function App() {
   return (
@@ -13,7 +15,9 @@ function App() {
         <HelmetProvider>
           <ThemeProvider theme={theme}>
             <QrCodeProvider>
-              <Layout />
+              <AuthContextProvider>
+                <Layout />
+              </AuthContextProvider>
             </QrCodeProvider>
           </ThemeProvider>
         </HelmetProvider>
