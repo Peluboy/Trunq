@@ -25,15 +25,17 @@ const LinkCard = ({
     await deleteLink(id);
   };
 
-  // const shortUrl = customURL
-  //   ? `${window.location.host}/${customURL}`
-  //   : `${window.location.host}/${shortCode}`;
+  const shortUrl = customURL
+    ? `${window.location.host}/${customURL}`
+    : `${window.location.host}/${shortCode}`;
+
+  // console.log(shortUrl);
 
   // const shortUrl = customURL
-  //   ? `app.trunq.xyz/${customURL}`
+  //   ? `trunq.xyz/${customURL}`
   //   : `trunq.xyz/${shortCode}`;
 
-  const shortUrl = customURL ? `${customURL}` : `${shortCode}`;
+  // const shortUrl = customURL ? `${customURL}` : `${shortCode}`;
 
   const formatCreatedAt = (createdAt: Date) => {
     if (isValid(createdAt)) {

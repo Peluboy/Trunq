@@ -32,6 +32,9 @@ import {
   limit,
   updateDoc,
   increment,
+  collectionGroup,
+  where,
+  writeBatch,
 } from "firebase/firestore";
 import { isValid } from "date-fns";
 import NoLinks from "../assets/images/no_links.svg";
@@ -104,6 +107,8 @@ const TopBar2 = ({
   const [totalClicks, setTotalClicks] = useState(0);
   const [totalLinks, setTotalLinks] = useState(0);
   const [customUrl, setCustomUrl] = useState("");
+  const [shortURL, setShortURL] = useState("");
+  const [link, setLink] = useState("");
 
   const isMobile = useMediaQuery("(max-width: 600px)");
 
@@ -154,9 +159,9 @@ const TopBar2 = ({
     };
 
     if (!customURL || customURL.trim() === "") {
-      link.shortCode = await generateShortCode(longURL);
+      link.shortCode = await generateShortCode(longURL); // Update the code here
     } else {
-      link.shortCode = await generateShortCode(longURL, customURL);
+      link.shortCode = await generateShortCode(longURL, customURL); // Update the code here
     }
 
     if (!link.shortCode) {
@@ -297,21 +302,28 @@ const TopBar2 = ({
         const linkDocSnapshot = await getDoc(linkDocRef);
 
         if (linkDocSnapshot.exists()) {
-          const { linkID, shortCode } = linkDocSnapshot.data() as {
-            linkID?: string;
+          const { shortCode } = linkDocSnapshot.data() as {
             shortCode?: string;
           };
 
           if (shortCode) {
-            const linksCollectionRef = collection(firestore, "links");
-            // const rootLinkDocRef = doc(linksCollectionRef, "shrtco.de");
-            const rootLinkDocRef = doc(linksCollectionRef, shortCode);
-            await deleteDoc(rootLinkDocRef);
+            const linksQuery = query(
+              collectionGroup(firestore, "links"),
+              where("shortCode", "==", shortCode)
+            );
+
+            const querySnapshot = await getDocs(linksQuery);
+
+            if (!querySnapshot.empty) {
+              const rootLinkDocRef = querySnapshot.docs[0].ref;
+              await deleteDoc(rootLinkDocRef);
+            }
           }
         }
 
         await deleteDoc(linkDocRef);
       }
+
       setLinks((oldLinks) => oldLinks.filter((link) => link.id !== linkDocID));
       setTotalLinks((prevTotalLinks) => prevTotalLinks - 1);
     }
@@ -320,7 +332,6 @@ const TopBar2 = ({
   const handleCopyLink = useCallback((shortUrl: string) => {
     const completeUrl = `https://${shortUrl}`;
     copy(completeUrl);
-    // window.location.replace(completeUrl);
     setNewLinkToaster(true);
   }, []);
 

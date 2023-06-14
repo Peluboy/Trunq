@@ -45,7 +45,7 @@ const Footer = () => {
                 sx={{ width: { xs: "100%", sm: "300px" }, maxWidth: "300px" }}
               >
                 <TextField
-                  name="name"
+                  name="subscribe"
                   type="text"
                   variant="filled"
                   fullWidth

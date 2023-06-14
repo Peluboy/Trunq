@@ -243,29 +243,6 @@ const TopBar = ({
     fetchLinks();
   }, [auth.currentUser?.uid, links]);
 
-  // useEffect(() => {
-  //   const handleRedirect = async () => {
-  //     const linkCode = window.location.pathname.substring(1);
-  //     const linkDocRef = doc(collection(firestore, "links"), linkCode);
-  //     const linkDocSnapshot = await getDoc(linkDocRef);
-
-  //     if (linkDocSnapshot.exists()) {
-  //       const { longURL } = linkDocSnapshot.data() as { longURL: string };
-
-  //       await updateDoc(linkDocRef, { totalClicks: increment(1) }); // Update the click count
-
-  //       setTimeout(() => {
-  //         window.location.href = longURL; // Redirect to the longURL
-  //       }, 0);
-  //     } else {
-  //       // Handle invalid or non-existent shortcode
-  //       console.log("Invalid shortcode or link does not exist");
-  //     }
-  //   };
-
-  //   handleRedirect();
-  // }, []);
-
   const handleDeleteLink = useCallback(async (linkDocID: string) => {
     const { currentUser } = auth;
     if (window.confirm("Are you sure you want to delete this link?")) {

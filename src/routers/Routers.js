@@ -8,6 +8,8 @@ import LinkRedirect from "../components/LinkRedirect";
 import ForgetPassowrd from "../pages/ForgetPassowrd";
 import ResetPassword from "../pages/ResetPassword";
 import ErrorPage from "../pages/ErrorPage";
+import URLRedirect from "../components/URLRedirect";
+import Redirect from "../components/Redirect";
 
 const Routers = () => {
   const [user, setUser] = useState(null);
@@ -40,6 +42,7 @@ const Routers = () => {
         element={user ? <Account /> : <Navigate to="/home" />}
       />
       {/* <Route path="/:shortCode" element={<LinkRedirect />} /> */}
+      <Route path="/:shortCode" element={<Redirect />} />
       <Route path="/forgot-password" element={<ForgetPassowrd />} />
       <Route path="/reset-password" element={<ResetPassword />} />
       <Route path="*" element={<ErrorPage />} />
