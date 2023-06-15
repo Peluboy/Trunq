@@ -12,7 +12,7 @@ const Home = () => {
       <Box bgcolor="white" sx={{ overflowX: "hidden" }}>
         <Hero />
       </Box>
-      <Box bgcolor="#3A414A" px={4} pb={5} sx={{ overflowX: "hidden" }}>
+      {/* <Box bgcolor="#3A414A" px={4} pb={5} sx={{ overflowX: "hidden" }}>
         <Shorten />
         <HowItWorks />
       </Box>
@@ -24,7 +24,7 @@ const Home = () => {
       </Box>
       <Box bgcolor="white" px={4} sx={{ overflowX: "hidden" }}>
         <Footer />
-      </Box>
+      </Box> */}
     </>
   );
 };

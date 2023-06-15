@@ -6,7 +6,8 @@ import { RiDeleteBin6Line } from "react-icons/ri";
 import { LinkCardProps } from "../components/Topbar2";
 import format from "date-fns/format";
 import { isValid } from "date-fns";
-import { useState, useEffect, memo } from "react";
+import { useState, useEffect, memo, useContext } from "react";
+import { LinkContext } from "../contexts/LinkContext";
 
 const LinkCard = ({
   id,
@@ -19,6 +20,7 @@ const LinkCard = ({
   customURL,
 }: LinkCardProps) => {
   const [createdAt, setCreatedAt] = useState<Date | null>(null);
+  const { totalClicks: contextTotalClicks } = useContext(LinkContext);
   const isMobile = useMediaQuery("(max-width: 600px)");
 
   const handleDeleteLink = async () => {
@@ -28,14 +30,6 @@ const LinkCard = ({
   const shortUrl = customURL
     ? `${window.location.host}/${customURL}`
     : `${window.location.host}/${shortCode}`;
-
-  // console.log(shortUrl);
-
-  // const shortUrl = customURL
-  //   ? `trunq.xyz/${customURL}`
-  //   : `trunq.xyz/${shortCode}`;
-
-  // const shortUrl = customURL ? `${customURL}` : `${shortCode}`;
 
   const formatCreatedAt = (createdAt: Date) => {
     if (isValid(createdAt)) {
@@ -84,6 +78,7 @@ const LinkCard = ({
             <Typography
               variant="body2"
               style={{ overflow: "hidden", textOverflow: "ellipsis" }}
+              textTransform="none"
               pt={0.5}
             >
               {longURL}
@@ -95,6 +90,7 @@ const LinkCard = ({
               <Typography
                 variant="body2"
                 color="primary"
+                textTransform="none"
                 fontSize={isMobile ? "11px" : "14px"}
               >
                 {shortUrl}
@@ -104,7 +100,7 @@ const LinkCard = ({
         </Box>
         <Box display="flex" gap=".5rem">
           <Typography variant="body2" fontSize={isMobile ? "16px" : "16px"}>
-            {totalClicks}
+            {totalClicks || contextTotalClicks}
           </Typography>{" "}
           <BsBarChartLine color="#a1a1a1" size={isMobile ? "18px" : "18px"} />
           <IoCopyOutline

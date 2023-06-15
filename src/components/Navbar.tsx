@@ -71,7 +71,7 @@ const Navbar = () => {
                   variant="contained"
                   onClick={() => setOpenAuthModal(true)}
                 >
-                  Get Started
+                  Login / Sign up
                 </Button>
               </>
             )}

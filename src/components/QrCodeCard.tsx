@@ -12,27 +12,38 @@ import { AiOutlinePlus } from "react-icons/ai";
 import Barcode from "../assets/images/barcode.png";
 import { useQrCodeContext } from "../contexts/QrCodeProvider";
 import { saveAs } from "file-saver";
-import axios from "axios";
 
 const QrCodeCard = () => {
   const { link, setLink, generateQrCode, qrCodeResponse, loading } =
     useQrCodeContext();
 
   const [generateButtonDisabled, setGenerateButtonDisabled] = useState(false);
+  const [hasInteracted, setHasInteracted] = useState(false);
+  const [isValidLink, setIsValidLink] = useState(true);
 
   const matches = useMediaQuery((theme: any) => theme.breakpoints.up("sm"));
 
   const handleGenerateClick = async () => {
-    await generateQrCode();
-    setGenerateButtonDisabled(true);
+    if (link.trim() !== "") {
+      await generateQrCode();
+      setGenerateButtonDisabled(true);
+    }
   };
 
   const handleLinkChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setLink(event.target.value);
+    const inputLink = event.target.value;
+    setLink(inputLink);
+    setHasInteracted(true);
+    validateLink(inputLink);
   };
 
   const handleDownloadClick = () => {
     saveAs(qrCodeResponse, "qrcode.png");
+  };
+
+  const validateLink = (inputLink: string) => {
+    const linkRegex = /^(https?:\/\/)?([\w.-]+)\.([a-z]{2,})(\/\S*)?$/i;
+    setIsValidLink(linkRegex.test(inputLink));
   };
 
   useEffect(() => {
@@ -57,28 +68,44 @@ const QrCodeCard = () => {
               Paste your Link
             </Typography>
             <Box display="flex" gap={0.5}>
-              <TextField
-                fullWidth
-                size="small"
-                name="longUrl"
-                type="text"
-                placeholder="https://webinar.online/example?:hgbe123pp"
-                value={link}
-                onChange={handleLinkChange}
-              />
-              <Button
-                variant="contained"
-                disableElevation
-                onClick={handleGenerateClick}
-                disabled={generateButtonDisabled || loading}
-              >
-                <Box display="flex" alignItems="center">
-                  Generate
-                  <Box ml=".5rem">
-                    <AiOutlinePlus />
+              <Box width="100%">
+                <TextField
+                  fullWidth
+                  size="small"
+                  name="longUrl"
+                  type="text"
+                  placeholder="https://webinar.online/example?:hgbe123pp"
+                  value={link}
+                  onChange={handleLinkChange}
+                  error={hasInteracted && (!link.trim() || !isValidLink)} // Show the error when the user has interacted and the field is empty
+                  helperText={
+                    hasInteracted &&
+                    (!link.trim()
+                      ? "Link is required"
+                      : !isValidLink && "Invalid link format")
+                  }
+                />
+              </Box>
+              <Box>
+                <Button
+                  variant="contained"
+                  disableElevation
+                  onClick={handleGenerateClick}
+                  disabled={
+                    generateButtonDisabled ||
+                    loading ||
+                    !link.trim() ||
+                    !isValidLink
+                  }
+                >
+                  <Box display="flex" alignItems="center">
+                    Generate
+                    <Box ml=".5rem">
+                      <AiOutlinePlus />
+                    </Box>
                   </Box>
-                </Box>
-              </Button>
+                </Button>
+              </Box>
             </Box>
             <Typography variant="body1" pt={3}>
               Create QR codes easily with our QR Code Generator. Just paste your

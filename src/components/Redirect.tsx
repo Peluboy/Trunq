@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useContext } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import {
   getDoc,
@@ -8,11 +8,11 @@ import {
   increment,
 } from "firebase/firestore";
 import { firestore } from "../utils/Firebase";
+import { LinkContext } from "../contexts/LinkContext";
 
 const Redirect = () => {
   const location = useLocation();
-  const [redirecting, setRedirecting] = useState(false);
-  const [redirectURL, setRedirectURL] = useState("");
+  const { updateTotalClicks } = useContext(LinkContext);
 
   useEffect(() => {
     const handleRedirect = async () => {
@@ -25,12 +25,12 @@ const Redirect = () => {
         const clicks = typeof totalClicks === "number" ? totalClicks : 0;
 
         // Increment click count
-        await updateDoc(linkDocRef, { totalClicks: clicks + 1 });
+        await updateDoc(linkDocRef, { totalClicks: increment(1) });
+
+        updateTotalClicks(clicks + 1); // Update the totalClicks value
 
         console.log("Total clicks:", clicks + 1); // Log the updated value
 
-        setRedirecting(true);
-        setRedirectURL(longURL);
         window.location.href = longURL; // Redirect to the longURL
       } else {
         // Handle invalid or non-existent shortcode
@@ -39,9 +39,9 @@ const Redirect = () => {
     };
 
     handleRedirect();
-  }, [location.pathname]);
+  }, [location.pathname, updateTotalClicks]);
 
-  return <div>{redirecting && <p>Redirecting ...</p>}</div>;
+  return <div>Redirecting...</div>;
 };
 
 export default Redirect;

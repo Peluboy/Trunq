@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback, useState } from "react";
+import React, { useEffect, useCallback, useState, useContext } from "react";
 import "../styles/account.css";
 import {
   Box,
@@ -30,14 +30,16 @@ import {
   deleteDoc,
   query,
   limit,
+  onSnapshot,
   updateDoc,
   increment,
 } from "firebase/firestore";
 import { isValid } from "date-fns";
 import NoLinks from "../assets/images/no_links.svg";
 import QrCodeCard from "./QrCodeCard";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 // import { updateOGPTags } from "../openGraphUtils";
+import { LinkContext } from "../contexts/LinkContext";
 
 export interface LinkCardProps {
   id: string;
@@ -57,6 +59,7 @@ export interface LinkCardProps {
 export interface Link extends LinkCardProps {
   deleteLink: (linkDocID: string) => Promise<void>;
   copyLink: (shortUrl: string) => void;
+  totalClicks: number;
 }
 
 interface TabPanelProps {
@@ -105,6 +108,8 @@ const TopBar = ({
   const [totalClicks, setTotalClicks] = useState(0);
   const [totalLinks, setTotalLinks] = useState(0);
   const [customUrl, setCustomUrl] = useState("");
+  const { updateTotalClicks } = useContext(LinkContext);
+  const location = useLocation();
 
   const isMobile = useMediaQuery("(max-width: 600px)");
 
@@ -151,6 +156,7 @@ const TopBar = ({
       linkID: linkID,
       longURL: link.longURL,
       userID: link.userID,
+      shortCode: link.shortCode, // Store the shortCode in the document
     });
 
     const newLink: Link = {
@@ -160,6 +166,7 @@ const TopBar = ({
       deleteLink: handleDeleteLink,
       copyLink: handleCopyLink,
       shortCode: link.shortCode,
+      totalClicks: 0,
     };
 
     setLinks((prevLinks) => [...prevLinks, newLink]);
@@ -175,13 +182,12 @@ const TopBar = ({
 
     const fetchLinks = async () => {
       const linksQuery = query(linksPathRef, limit(20)); // Fetch only 20 documents
-      // const querySnapshot = await getDocs(linksQuery);
 
       const querySnapshot = await getDocs(linksQuery);
 
       const tempLinks: Link[] = [];
       let clicks = 0;
-      querySnapshot.forEach((doc) => {
+      querySnapshot.forEach(async (doc) => {
         const {
           name,
           longURL,
@@ -213,7 +219,7 @@ const TopBar = ({
           createdAt: new Date(
             createdAt.seconds * 1000 + createdAt.nanoseconds / 1000000
           ),
-          totalClicks,
+          totalClicks, // Assign the correct value to totalClicks
           copyLink: handleCopyLink,
           deleteLink: handleDeleteLink,
           customURL: customURL || "",
@@ -224,8 +230,25 @@ const TopBar = ({
           id: doc.id,
           deleteLink: handleDeleteLink,
           copyLink: handleCopyLink,
+          totalClicks: totalClicks,
         });
-        clicks += data.totalClicks;
+        clicks += totalClicks; // Update the totalClicks variable
+
+        // Track number of clicks for each link
+        const linkDocRef = doc.ref; // Use doc.ref to get the document reference
+        const snapshot = await getDoc(linkDocRef);
+        const updatedTotalClicks = snapshot.data() as { totalClicks: number };
+        if (
+          updatedTotalClicks &&
+          updatedTotalClicks.totalClicks !== undefined
+        ) {
+          const updatedLinks = tempLinks.map((link) =>
+            link.id === doc.id
+              ? { ...link, totalClicks: updatedTotalClicks.totalClicks }
+              : link
+          );
+          setLinks(updatedLinks);
+        }
       });
 
       tempLinks.sort((prevLink, nextLink) =>
@@ -272,8 +295,8 @@ const TopBar = ({
   }, []);
 
   const handleCopyLink = useCallback((shortUrl: string) => {
-    const completeUrl = `https://${shortUrl}`;
-    copy(completeUrl);
+    // const completeUrl = `https://${shortUrl}`;
+    copy(shortUrl);
     setNewLinkToaster(true);
   }, []);
 

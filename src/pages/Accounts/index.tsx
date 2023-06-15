@@ -3,6 +3,7 @@ import Analytics from "../../components/Analytics";
 import TopBar from "../../components/TopBar";
 // import TopBar2 from "../../components/Topbar2";
 import ShortenLinkForm from "../../components/ShortenLinkForm";
+import { LinkProvider } from "../../contexts/LinkContext";
 
 const Account = () => {
   const [totalClicks, setTotalClicks] = useState(0);
@@ -15,8 +16,10 @@ const Account = () => {
 
   return (
     <>
-      <Analytics totalClicks={totalClicks} totalLinks={totalLinks} />
-      <TopBar updateStats={updateStats} />
+      <LinkProvider>
+        <Analytics totalClicks={totalClicks} totalLinks={totalLinks} />
+        <TopBar updateStats={updateStats} />
+      </LinkProvider>
       {/* <ShortenLinkForm /> */}
       {/* <TopBar2 updateStats={updateStats} /> */}
     </>

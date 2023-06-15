@@ -11,6 +11,7 @@ export const theme = createTheme({
     },
   },
   palette: {
+    mode: "light", // Set the default mode to light
     primary: {
       main: "#1463FF",
     },
@@ -23,9 +24,24 @@ export const theme = createTheme({
     success: {
       main: "#a1a1a1",
     },
+    // Update the colors for dark mode
+    dark: {
+      primary: {
+        main: "#FF6F00", // Update the primary color for dark mode
+      },
+      secondary: {
+        main: "#212121", // Update the secondary color for dark mode
+      },
+      info: {
+        main: "#E0E0E0", // Update the info color for dark mode
+      },
+      success: {
+        main: "#757575", // Update the success color for dark mode
+      },
+    },
   },
   typography: {
-    // fontFamily: "Stagnan, sans-serif",
+    // Typography styles remain the same
     h1: {
       color: "#1D2A36",
       fontFamily: "Stagnan, sans-serif",
@@ -61,23 +77,20 @@ export const theme = createTheme({
       color: "#a1a1a1",
       fontSize: "14px",
       fontWeight: 400,
-      // textTransform: "capitalize",
     },
-
     body1: {
       color: "#d0d0d0",
       fontSize: "12px",
       fontWeight: 400,
-      textTransform: "caipitalize",
+      textTransform: "capitalize",
     },
-
     overline: {
       color: "#767676",
       fontSize: "11px",
       fontWeight: 500,
     },
     button: {
-      textTransform: "capitalize",
+      textTransform: "inherit",
       fontSize: "12px",
       fontWeight: 500,
     },
