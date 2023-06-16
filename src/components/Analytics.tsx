@@ -14,23 +14,32 @@ export interface AnalyticsProps {
 
 const Analytics = ({ totalClicks, totalLinks }: AnalyticsProps) => {
   const [topLocation, setTopLocation] = useState("Nigeria"); // State variable to hold the top location value
+  const [totalClicksSum, setTotalClicksSum] = useState(0);
 
   useEffect(() => {
-    const fetchTopLocation = async () => {
+    const fetchTotalClicksSum = async () => {
       try {
-        const analyticsRef = collection(firestore, "analytics");
-        const analyticsSnapshot = await getDocs(analyticsRef);
-        const countries = analyticsSnapshot.docs.map((doc) => doc.id);
+        const linksRef = collection(firestore, "links");
+        const linksSnapshot = await getDocs(linksRef);
 
-        if (countries.length > 0) {
-          setTopLocation(countries[0]); // Assuming the first country in the list is the top one
-        }
+        const promises = linksSnapshot.docs.map(async (doc) => {
+          const { totalClicks } = doc.data();
+          return totalClicks;
+        });
+
+        const totalClicksArray = await Promise.all(promises);
+        const sum = totalClicksArray.reduce(
+          (accumulator, currentValue) => accumulator + currentValue,
+          0
+        );
+
+        setTotalClicksSum(sum);
       } catch (error) {
-        console.error("Error fetching top location:", error);
+        console.error("Error fetching total clicks:", error);
       }
     };
 
-    fetchTopLocation();
+    fetchTotalClicksSum();
   }, []);
 
   return (
@@ -60,7 +69,7 @@ const Analytics = ({ totalClicks, totalLinks }: AnalyticsProps) => {
                 <Box pt=".2rem" mr=".8rem">
                   <TbHandClick size="18px" color="#A1A1A1" />
                 </Box>
-                <Typography variant="h4">{totalClicks}</Typography>
+                <Typography variant="h4">{totalClicksSum}</Typography>
               </Box>
               <Box ml="2rem">
                 <Typography variant="body2">Total Clicks</Typography>

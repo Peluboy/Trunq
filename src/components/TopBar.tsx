@@ -40,6 +40,8 @@ import QrCodeCard from "./QrCodeCard";
 import { useNavigate, useLocation } from "react-router-dom";
 // import { updateOGPTags } from "../openGraphUtils";
 import { LinkContext } from "../contexts/LinkContext";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 export interface LinkCardProps {
   id: string;
@@ -234,9 +236,9 @@ const TopBar = ({
         });
         clicks += totalClicks; // Update the totalClicks variable
 
-        // Track number of clicks for each link
-        const linkDocRef = doc.ref; // Use doc.ref to get the document reference
-        const snapshot = await getDoc(linkDocRef);
+        // Track number of clicks for each link in the users subcollection
+        const userLinkDocRef = doc.ref; // Use doc.ref to get the document reference
+        const snapshot = await getDoc(userLinkDocRef);
         const updatedTotalClicks = snapshot.data() as { totalClicks: number };
         if (
           updatedTotalClicks &&
@@ -297,17 +299,19 @@ const TopBar = ({
   const handleCopyLink = useCallback((shortUrl: string) => {
     // const completeUrl = `https://${shortUrl}`;
     copy(shortUrl);
-    setNewLinkToaster(true);
+    // setNewLinkToaster(true);
+    toast.success("Link copied successfully");
   }, []);
 
   return (
     <>
-      <Snackbar
+      {/* <Snackbar
         open={newLinkToaster}
         onClose={() => setNewLinkToaster(false)}
         autoHideDuration={2000}
         message="Link copied to the clipboard"
-      />
+      /> */}
+      <ToastContainer position="bottom-center" />
       {openModal && (
         <ShortenURLModal
           createShortenLink={handleCreateShortenLink}

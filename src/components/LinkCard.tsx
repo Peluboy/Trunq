@@ -1,13 +1,20 @@
-import { Box, Typography, useMediaQuery, Tooltip } from "@mui/material";
-import { BsBarChartLine } from "react-icons/bs";
-import { IoCopyOutline } from "react-icons/io5";
-import { RiDeleteBin6Line } from "react-icons/ri";
-// import { LinkCardProps } from "../components/TopBar";
-import { LinkCardProps } from "../components/Topbar2";
+import {
+  Box,
+  Typography,
+  useMediaQuery,
+  Tooltip,
+  IconButton,
+} from "@mui/material";
+import DeleteIcon from "@mui/icons-material/Delete";
+import ContentCopyIcon from "@mui/icons-material/ContentCopy";
+import SignalCellularAltIcon from "@mui/icons-material/SignalCellularAlt";
+import { LinkCardProps } from "../components/TopBar";
 import format from "date-fns/format";
 import { isValid } from "date-fns";
 import { useState, useEffect, memo, useContext } from "react";
 import { LinkContext } from "../contexts/LinkContext";
+import { getDoc, doc } from "firebase/firestore";
+import { firestore } from "../utils/Firebase";
 
 const LinkCard = ({
   id,
@@ -20,7 +27,8 @@ const LinkCard = ({
   customURL,
 }: LinkCardProps) => {
   const [createdAt, setCreatedAt] = useState<Date | null>(null);
-  const { totalClicks: contextTotalClicks } = useContext(LinkContext);
+  const { totalClicks: updateTotalClicks } = useContext(LinkContext);
+  const [linkTotalClicks, setLinkTotalClicks] = useState<number | null>(null);
   const isMobile = useMediaQuery("(max-width: 600px)");
 
   const handleDeleteLink = async () => {
@@ -51,6 +59,22 @@ const LinkCard = ({
       setCreatedAt(currentCreatedAt);
     }
   }, [id]);
+
+  useEffect(() => {
+    const fetchLinkTotalClicks = async () => {
+      const linkDocRef = doc(firestore, "links", shortCode);
+      const linkDocSnapshot = await getDoc(linkDocRef);
+
+      if (linkDocSnapshot.exists()) {
+        const { totalClicks } = linkDocSnapshot.data();
+        setLinkTotalClicks(totalClicks);
+      }
+    };
+
+    fetchLinkTotalClicks();
+  }, [shortCode]);
+
+  const displayTotalClicks = linkTotalClicks || totalClicks;
 
   return (
     <>
@@ -98,24 +122,22 @@ const LinkCard = ({
             </Tooltip>
           </Box>
         </Box>
-        <Box display="flex" gap=".5rem">
-          <Typography variant="body2" fontSize={isMobile ? "16px" : "16px"}>
-            {totalClicks || contextTotalClicks}
+        <Box display="flex" alignItems="center">
+          <Typography variant="body2" fontSize={isMobile ? "16px" : "20px"}>
+            {displayTotalClicks}
           </Typography>{" "}
-          <BsBarChartLine color="#a1a1a1" size={isMobile ? "18px" : "18px"} />
-          <IoCopyOutline
-            color="#a1a1a1"
-            cursor="pointer"
+          <IconButton sx={{ marginRight: isMobile ? "-10px" : "-8px" }}>
+            <SignalCellularAltIcon fontSize="small" color="success" />
+          </IconButton>
+          <IconButton
             onClick={() => copyLink(shortUrl)}
-            size={isMobile ? "18px" : "18px"}
-            data-testid="copy-link"
-          />
-          <RiDeleteBin6Line
-            color="#a1a1a1"
-            onClick={handleDeleteLink}
-            cursor="pointer"
-            size={isMobile ? "18px" : "18px"}
-          />
+            sx={{ marginRight: isMobile ? "-10px" : "-8px" }}
+          >
+            <ContentCopyIcon fontSize="small" color="success" />
+          </IconButton>
+          <IconButton onClick={handleDeleteLink}>
+            <DeleteIcon fontSize="small" color="success" />
+          </IconButton>
         </Box>
       </Box>
     </>
