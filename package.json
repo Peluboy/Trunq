@@ -85,6 +85,7 @@
     "@types/validator": "^13.7.17",
     "babel-jest": "^29.5.0",
     "jest": "^27.5.1",
+    "react-testing-library": "^8.0.1",
     "webpack-cli": "^5.1.4"
   }
 }

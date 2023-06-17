@@ -6,14 +6,15 @@ import { collection, getDocs } from "firebase/firestore";
 import { firestore } from "../utils/Firebase";
 import AdsClickIcon from "@mui/icons-material/AdsClick";
 import FmdGoodOutlinedIcon from "@mui/icons-material/FmdGoodOutlined";
+
 export interface AnalyticsProps {
   totalClicks: number;
   totalLinks: number;
 }
 
 const Analytics = ({ totalClicks, totalLinks }: AnalyticsProps) => {
-  const [topLocation, setTopLocation] = useState("Nigeria"); // State variable to hold the top location value
   const [totalClicksSum, setTotalClicksSum] = useState(0);
+  const [topLocation, setTopLocation] = useState("");
 
   useEffect(() => {
     const fetchTotalClicksSum = async () => {
@@ -24,7 +25,7 @@ const Analytics = ({ totalClicks, totalLinks }: AnalyticsProps) => {
         const promises = linksSnapshot.docs.map(async (doc) => {
           const { totalClicks } = doc.data();
           const parsedClicks = parseInt(totalClicks);
-          return isNaN(parsedClicks) ? 0 : parsedClicks; // If parsing fails, default to 0
+          return isNaN(parsedClicks) ? 0 : parsedClicks;
         });
 
         const totalClicksArray = await Promise.all(promises);
@@ -34,6 +35,9 @@ const Analytics = ({ totalClicks, totalLinks }: AnalyticsProps) => {
         );
 
         setTotalClicksSum(sum);
+
+        // Update the topLocation value based on the totalClicksSum
+        setTopLocation(sum === 0 ? "No Data" : "Nigeria");
       } catch (error) {
         console.error("Error fetching total clicks:", error);
       }
@@ -75,18 +79,6 @@ const Analytics = ({ totalClicks, totalLinks }: AnalyticsProps) => {
                 <Typography variant="body2">Total Clicks</Typography>
               </Box>
             </Box>
-
-            {/* <Box display="flex" flexDirection="column">
-              <Box display="flex" alignContent="flex-start">
-                <Box pt=".2rem" mr=".8rem">
-                  <AiOutlinePieChart size="18px" color="#A1A1A1" />
-                </Box>
-                <Typography variant="h4">21%</Typography>
-              </Box>
-              <Box ml="2rem">
-                <Typography variant="body2">Avg. CTR</Typography>
-              </Box>
-            </Box> */}
 
             <Box display="flex" flexDirection="column">
               <Box display="flex" alignContent="flex-start">

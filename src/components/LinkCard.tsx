@@ -13,7 +13,15 @@ import format from "date-fns/format";
 import { isValid } from "date-fns";
 import { useState, useEffect, memo, useContext } from "react";
 import { LinkContext } from "../contexts/LinkContext";
-import { getDoc, doc } from "firebase/firestore";
+import {
+  getDocs,
+  getDoc,
+  doc,
+  collection,
+  query,
+  orderBy,
+  limit,
+} from "firebase/firestore";
 import { firestore } from "../utils/Firebase";
 
 const LinkCard = ({
@@ -29,7 +37,11 @@ const LinkCard = ({
   const [createdAt, setCreatedAt] = useState<Date | null>(null);
   const { totalClicks: updateTotalClicks } = useContext(LinkContext);
   const [linkTotalClicks, setLinkTotalClicks] = useState<number | null>(null);
+  const [topLocation, setTopLocation] = useState("Nigeria");
   const isMobile = useMediaQuery("(max-width: 600px)");
+  const [displayTotalClicks, setDisplayTotalClicks] = useState<number | null>(
+    null
+  );
 
   const handleDeleteLink = async () => {
     await deleteLink(id);
@@ -68,13 +80,33 @@ const LinkCard = ({
       if (linkDocSnapshot.exists()) {
         const { totalClicks } = linkDocSnapshot.data();
         setLinkTotalClicks(totalClicks);
+        setDisplayTotalClicks(totalClicks); // Update displayTotalClicks separately
       }
     };
 
     fetchLinkTotalClicks();
   }, [shortCode]);
 
-  const displayTotalClicks = linkTotalClicks || totalClicks;
+  useEffect(() => {
+    const fetchTopLocation = async () => {
+      const locationQuery = query(
+        collection(firestore, "locations"),
+        orderBy("clicks", "desc"),
+        limit(1)
+      );
+      const locationSnapshot = await getDocs(locationQuery);
+
+      if (!locationSnapshot.empty) {
+        const topLocationData = locationSnapshot.docs[0].data();
+        console.log("Top Location Data:", topLocationData);
+        setTopLocation(topLocationData.name);
+      } else {
+        console.log("No location data found.");
+      }
+    };
+
+    fetchTopLocation();
+  }, []);
 
   return (
     <>
@@ -124,20 +156,34 @@ const LinkCard = ({
         </Box>
         <Box display="flex" alignItems="center">
           <Typography variant="body2" fontSize={isMobile ? "16px" : "20px"}>
-            {displayTotalClicks}
+            {displayTotalClicks !== null ? displayTotalClicks : ""}
           </Typography>{" "}
-          <IconButton sx={{ marginRight: isMobile ? "-10px" : "-8px" }}>
-            <SignalCellularAltIcon fontSize="small" color="success" />
-          </IconButton>
-          <IconButton
-            onClick={() => copyLink(shortUrl)}
-            sx={{ marginRight: isMobile ? "-10px" : "-8px" }}
+          <Tooltip
+            title={
+              displayTotalClicks !== null
+                ? `Top Location: ${displayTotalClicks > 0 ? topLocation : ""}`
+                : ""
+            }
+            arrow
+            placement="top"
           >
-            <ContentCopyIcon fontSize="small" color="success" />
-          </IconButton>
-          <IconButton onClick={handleDeleteLink}>
-            <DeleteIcon fontSize="small" color="success" />
-          </IconButton>
+            <IconButton sx={{ marginRight: isMobile ? "-10px" : "-8px" }}>
+              <SignalCellularAltIcon fontSize="small" color="success" />
+            </IconButton>
+          </Tooltip>
+          <Tooltip title="Copy" arrow placement="top">
+            <IconButton
+              onClick={() => copyLink(shortUrl)}
+              sx={{ marginRight: isMobile ? "-10px" : "-8px" }}
+            >
+              <ContentCopyIcon fontSize="small" color="success" />
+            </IconButton>
+          </Tooltip>
+          <Tooltip title="Delete" arrow placement="top">
+            <IconButton onClick={handleDeleteLink}>
+              <DeleteIcon fontSize="small" color="success" />
+            </IconButton>
+          </Tooltip>
         </Box>
       </Box>
     </>

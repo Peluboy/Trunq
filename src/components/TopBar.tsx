@@ -103,6 +103,7 @@ const TopBar = ({
   const [totalClicks, setTotalClicks] = useState(0);
   const [totalLinks, setTotalLinks] = useState(0);
   const [customUrl, setCustomUrl] = useState("");
+  const [clickLocation, setClickLocation] = useState("");
 
   const isMobile = useMediaQuery("(max-width: 600px)");
 
@@ -127,6 +128,7 @@ const TopBar = ({
       createdAt: new Date(),
       totalClicks: 0,
       description: "",
+      clickLocation: clickLocation,
       userID: auth.currentUser?.uid,
     };
 
@@ -135,6 +137,16 @@ const TopBar = ({
     } else {
       link.shortCode = customURL;
     }
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const { latitude, longitude } = position.coords;
+        setClickLocation(`[${latitude}, ${longitude}]`);
+      },
+      (error) => {
+        console.log("Error retrieving location:", error);
+      }
+    );
 
     const linksPathRef = collection(firestore, `users/${link.userID}/links`);
     const resp = await addDoc(linksPathRef, link);
@@ -392,6 +404,7 @@ const TopBar = ({
                       {...link}
                       deleteLink={handleDeleteLink}
                       copyLink={handleCopyLink}
+                      clickLocation={link.clickLocation}
                     />
                   ))
               )}

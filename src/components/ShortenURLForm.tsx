@@ -8,11 +8,13 @@ import {
   Button,
   TextField,
   useMediaQuery,
+  IconButton,
+  Tooltip,
 } from "@mui/material";
 import { BsQrCodeScan } from "react-icons/bs";
 import AuthModal from "./AuthModal";
 import { AiOutlineLink } from "react-icons/ai";
-
+import LockIcon from "@mui/icons-material/Lock";
 interface TabPanelProps {
   children?: React.ReactNode;
   index: number;
@@ -134,17 +136,36 @@ const ShortenURLForm = () => {
                   fontWeight={500}
                   pb={0.7}
                 >
-                  Set your Custom URL
+                  Set your custom Domain & URL
                 </Typography>
+
                 <Box display="flex" alignItems="stretch" gap={0.5} pb={2}>
-                  <Button
-                    variant="contained"
-                    disabled
-                    disableElevation
-                    size="medium"
+                  <Tooltip
+                    title="Custom domain is unavailable"
+                    arrow
+                    placement="right"
                   >
-                    <Typography variant="h6">trunq.xyz/</Typography>
-                  </Button>
+                    <span>
+                      <Button
+                        variant="contained"
+                        disabled
+                        disableElevation
+                        size="medium"
+                      >
+                        <Box
+                          display="flex"
+                          justifyContent="space-between"
+                          alignItems="center"
+                        >
+                          <Typography variant="h6">trunq.xyz/</Typography>
+                          <IconButton sx={{ marginRight: "-12px" }}>
+                            <LockIcon fontSize="small" color="success" />
+                          </IconButton>
+                        </Box>
+                      </Button>
+                    </span>
+                  </Tooltip>
+
                   <TextField
                     size="medium"
                     name="customUrl"
@@ -159,7 +180,7 @@ const ShortenURLForm = () => {
                 <Box
                   height="3rem"
                   bgcolor="#F4F7FF"
-                  p={{ xs: ".5rem", sm: "1rem" }}
+                  p={{ xs: "1rem", sm: "1rem" }}
                   borderRadius={1.5}
                   display="flex"
                   alignItems="center"

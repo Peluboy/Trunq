@@ -1,4 +1,4 @@
-import React, { useEffect, useContext, useState } from "react";
+import { useEffect, useContext, useState } from "react";
 import { useLocation } from "react-router-dom";
 import {
   getDoc,
@@ -29,9 +29,9 @@ const Redirect = () => {
 
         await updateDoc(linkDocRef, { totalClicks: increment(1) });
 
-        updateTotalClicks(clicks + 1);
+        updateTotalClicks(clicks + 1); // Update with totalClicks + 1
 
-        console.log("Total clicks:", clicks + 1);
+        console.log("Total clicks:", totalClicks + 1);
 
         window.location.href = longURL;
       } else {

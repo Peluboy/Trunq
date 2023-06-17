@@ -3,6 +3,7 @@ export default {
     "^.+\\.jsx?$": "babel-jest",
   },
   transformIgnorePatterns: ["/node_modules/(?!@mui|@babel/runtime)"],
+  testEnvironment: "jsdom",
   moduleNameMapper: {
     "^@mui/styled-engine/(.*)$": "@mui/styled-engine-sc/sc/$1",
     "^@mui/material/(.*)$": "<rootDir>/node_modules/@mui/material/$1",
