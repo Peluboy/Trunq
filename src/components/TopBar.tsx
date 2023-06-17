@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback, useState, useContext } from "react";
+import React, { useEffect, useCallback, useState } from "react";
 import "../styles/account.css";
 import {
   Box,
@@ -7,7 +7,6 @@ import {
   Typography,
   Grid,
   Button,
-  Snackbar,
   CircularProgress,
   useMediaQuery,
   Hidden,
@@ -30,16 +29,10 @@ import {
   deleteDoc,
   query,
   limit,
-  onSnapshot,
-  updateDoc,
-  increment,
 } from "firebase/firestore";
 import { isValid } from "date-fns";
 import NoLinks from "../assets/images/no_links.svg";
 import QrCodeCard from "./QrCodeCard";
-import { useNavigate, useLocation } from "react-router-dom";
-// import { updateOGPTags } from "../openGraphUtils";
-import { LinkContext } from "../contexts/LinkContext";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -102,7 +95,7 @@ const TopBar = ({
 }: {
   updateStats: (clicks: number, links: number) => void;
 }) => {
-  const [newLinkToaster, setNewLinkToaster] = useState(false);
+  // const [newLinkToaster, setNewLinkToaster] = useState(false);
   const [links, setLinks] = useState<Link[]>([]);
   const [openModal, setOpenModal] = useState(false);
   const [value, setValue] = useState(0);
@@ -110,16 +103,12 @@ const TopBar = ({
   const [totalClicks, setTotalClicks] = useState(0);
   const [totalLinks, setTotalLinks] = useState(0);
   const [customUrl, setCustomUrl] = useState("");
-  const { updateTotalClicks } = useContext(LinkContext);
-  const location = useLocation();
 
   const isMobile = useMediaQuery("(max-width: 600px)");
 
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
   };
-
-  const navigate = useNavigate();
 
   const handleCreateShortenLink = async (
     name: string,
@@ -270,7 +259,7 @@ const TopBar = ({
 
   const handleDeleteLink = useCallback(async (linkDocID: string) => {
     const { currentUser } = auth;
-    if (window.confirm("Are you sure you want to delete this link?")) {
+    if (window.confirm("Are you sure you want to delete this link?⚠️")) {
       if (currentUser) {
         const userDocRef = doc(collection(firestore, "users"), currentUser.uid);
         const linkDocRef = doc(collection(userDocRef, "links"), linkDocID);
@@ -305,12 +294,6 @@ const TopBar = ({
 
   return (
     <>
-      {/* <Snackbar
-        open={newLinkToaster}
-        onClose={() => setNewLinkToaster(false)}
-        autoHideDuration={2000}
-        message="Link copied to the clipboard"
-      /> */}
       <ToastContainer position="bottom-center" />
       {openModal && (
         <ShortenURLModal

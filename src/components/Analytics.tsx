@@ -1,12 +1,11 @@
 import { useState, useEffect } from "react";
 import { Box, Typography, Grid } from "@mui/material";
 import "../styles/account.css";
-import { AiOutlineLink, AiOutlineClockCircle } from "react-icons/ai";
-import { TbHandClick } from "react-icons/tb";
-import { IoLocationOutline } from "react-icons/io5";
+import { AiOutlineLink } from "react-icons/ai";
 import { collection, getDocs } from "firebase/firestore";
 import { firestore } from "../utils/Firebase";
-
+import AdsClickIcon from "@mui/icons-material/AdsClick";
+import FmdGoodOutlinedIcon from "@mui/icons-material/FmdGoodOutlined";
 export interface AnalyticsProps {
   totalClicks: number;
   totalLinks: number;
@@ -24,7 +23,8 @@ const Analytics = ({ totalClicks, totalLinks }: AnalyticsProps) => {
 
         const promises = linksSnapshot.docs.map(async (doc) => {
           const { totalClicks } = doc.data();
-          return totalClicks;
+          const parsedClicks = parseInt(totalClicks);
+          return isNaN(parsedClicks) ? 0 : parsedClicks; // If parsing fails, default to 0
         });
 
         const totalClicksArray = await Promise.all(promises);
@@ -55,7 +55,7 @@ const Analytics = ({ totalClicks, totalLinks }: AnalyticsProps) => {
             <Box display="flex" flexDirection="column">
               <Box display="flex" alignContent="flex-start">
                 <Box pt=".2rem" mr=".8rem">
-                  <AiOutlineLink size="18px" color="#A1A1A1" />
+                  <AiOutlineLink size="18px" color="#a1a1a1" />
                 </Box>
                 <Typography variant="h4">{totalLinks}</Typography>
               </Box>
@@ -67,7 +67,7 @@ const Analytics = ({ totalClicks, totalLinks }: AnalyticsProps) => {
             <Box display="flex" flexDirection="column">
               <Box display="flex" alignContent="flex-start">
                 <Box pt=".2rem" mr=".8rem">
-                  <TbHandClick size="18px" color="#A1A1A1" />
+                  <AdsClickIcon fontSize="small" color="success" />
                 </Box>
                 <Typography variant="h4">{totalClicksSum}</Typography>
               </Box>
@@ -91,7 +91,7 @@ const Analytics = ({ totalClicks, totalLinks }: AnalyticsProps) => {
             <Box display="flex" flexDirection="column">
               <Box display="flex" alignContent="flex-start">
                 <Box pt=".2rem" mr=".8rem">
-                  <IoLocationOutline size="18px" color="#A1A1A1" />
+                  <FmdGoodOutlinedIcon fontSize="small" color="success" />
                 </Box>
                 <Typography variant="h4">{topLocation}</Typography>
               </Box>
