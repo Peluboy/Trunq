@@ -180,7 +180,7 @@ const ShortenURLForm = () => {
                 <Box
                   height="3rem"
                   bgcolor="#F4F7FF"
-                  p={{ xs: "1rem", sm: "1rem" }}
+                  p={{ xs: ".5rem", sm: "1rem" }}
                   borderRadius={1.5}
                   display="flex"
                   alignItems="center"
@@ -192,7 +192,7 @@ const ShortenURLForm = () => {
                     fontFamily="Stagnan, sans-serif"
                     color="#1463FF"
                   >
-                    ✨ Make your link stand out with distinctive words
+                    ✨ Make your link standout with unique words.
                   </Typography>
                 </Box>
                 <Box pt={{ xs: "1rem", sm: "1rem" }} display="flex" gap={2}>
@@ -202,7 +202,7 @@ const ShortenURLForm = () => {
                     size="large"
                     onClick={() => setOpenAuthModal(true)}
                   >
-                    Sign up & get your link for FREE
+                    Sign up for a FREE link!
                   </Button>
                 </Box>
               </Box>

@@ -7,6 +7,7 @@ import { ErrorBoundary } from "./components/ErrorBoundary/ErrorBoundary";
 import { HelmetProvider } from "react-helmet-async";
 import AuthContextProvider from "./contexts/AuthContext";
 import { LinkProvider } from "./contexts/LinkContext";
+import { Scrollbars } from "react-custom-scrollbars-2";
 
 function App() {
   return (
@@ -17,7 +18,9 @@ function App() {
             <QrCodeProvider>
               <AuthContextProvider>
                 <LinkProvider>
-                  <Layout />
+                  <Scrollbars style={{ width: "100%", height: "100vh" }}>
+                    <Layout />
+                  </Scrollbars>
                 </LinkProvider>
               </AuthContextProvider>
             </QrCodeProvider>
