@@ -3,15 +3,15 @@
 # dependencies
 /node_modules
 /.pnp
-/.pnp.js
-/firebase-debug.log
-/firebase-debug.log
-/.env
-/.firebase
-/firebase-emulators
-/functions
-/.firebaserc
-/ui-debug.log
+.pnp.js
+firebase-debug.log
+firebase-debug.log
+.env
+*.firebase
+firebase-emulators
+functions
+.firebaserc
+ui-debug.log
 
 
 # testing
