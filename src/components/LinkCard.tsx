@@ -11,8 +11,7 @@ import SignalCellularAltIcon from "@mui/icons-material/SignalCellularAlt";
 import { LinkCardProps } from "../components/TopBar";
 import format from "date-fns/format";
 import { isValid } from "date-fns";
-import { useState, useEffect, memo, useContext } from "react";
-import { LinkContext } from "../contexts/LinkContext";
+import { useState, useEffect, memo } from "react";
 import {
   getDocs,
   getDoc,
@@ -29,13 +28,11 @@ const LinkCard = ({
   name,
   longURL,
   shortCode,
-  totalClicks,
   deleteLink,
   copyLink,
   customURL,
 }: LinkCardProps) => {
   const [createdAt, setCreatedAt] = useState<Date | null>(null);
-  const { totalClicks: updateTotalClicks } = useContext(LinkContext);
   const [linkTotalClicks, setLinkTotalClicks] = useState<number | null>(null);
   const [topLocation, setTopLocation] = useState("Nigeria");
   const isMobile = useMediaQuery("(max-width: 600px)");
@@ -80,7 +77,7 @@ const LinkCard = ({
       if (linkDocSnapshot.exists()) {
         const { totalClicks } = linkDocSnapshot.data();
         setLinkTotalClicks(totalClicks);
-        setDisplayTotalClicks(totalClicks); // Update displayTotalClicks separately
+        setDisplayTotalClicks(totalClicks);
       }
     };
 

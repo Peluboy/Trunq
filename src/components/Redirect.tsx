@@ -1,12 +1,6 @@
 import { useEffect, useContext, useState } from "react";
 import { useLocation } from "react-router-dom";
-import {
-  getDoc,
-  doc,
-  updateDoc,
-  collection,
-  increment,
-} from "firebase/firestore";
+import { getDoc, doc, runTransaction, collection } from "firebase/firestore";
 import { firestore } from "../utils/Firebase";
 import { LinkContext } from "../contexts/LinkContext";
 import { Typography, Box } from "@mui/material";
@@ -27,13 +21,25 @@ const Redirect = () => {
         const { longURL, totalClicks } = linkDocSnapshot.data();
         const clicks = typeof totalClicks === "number" ? totalClicks : 0;
 
-        await updateDoc(linkDocRef, { totalClicks: increment(1) });
+        const transactionRef = doc(collection(firestore, "links"), linkCode);
 
-        updateTotalClicks(clicks + 1); // Update with totalClicks + 1
+        try {
+          await runTransaction(firestore, async (transaction) => {
+            const docSnapshot = await transaction.get(transactionRef);
+            if (!docSnapshot.exists()) {
+              setError(true);
+              return;
+            }
 
-        console.log("Total clicks:", totalClicks + 1);
+            const newTotalClicks = (docSnapshot.data()?.totalClicks || 0) + 1;
+            transaction.update(transactionRef, { totalClicks: newTotalClicks });
+            updateTotalClicks(newTotalClicks);
+          });
 
-        window.location.href = longURL;
+          window.location.href = longURL;
+        } catch (error) {
+          setError(true);
+        }
       } else {
         setError(true);
       }

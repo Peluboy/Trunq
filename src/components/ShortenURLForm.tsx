@@ -248,12 +248,7 @@ const ShortenURLForm = () => {
                       you want. Share your links effortlessly and connect with
                       your audience in a snap. Try our QR Code Generator now!
                     </Typography>
-                    <Box
-                      pt={3}
-                      display="flex"
-                      gap={2}
-                      //   sx={{ paddingBottom: "1rem" }}
-                    >
+                    <Box pt={3} display="flex" gap={2}>
                       <Button
                         variant="contained"
                         disableElevation

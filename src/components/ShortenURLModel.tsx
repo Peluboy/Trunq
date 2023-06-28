@@ -52,10 +52,11 @@ const ShortenURLModal = ({
   const handleCustomUrlChange = (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
-    setCustomUrl(event.target.value);
+    const lowercaseCustomUrl = event.target.value.toLowerCase();
+    setCustomUrl(lowercaseCustomUrl);
     setForm((oldForm) => ({
       ...oldForm,
-      customUrl: event.target.value,
+      customUrl: lowercaseCustomUrl,
     }));
   };
 

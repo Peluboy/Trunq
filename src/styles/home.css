@@ -50,7 +50,7 @@ p {
   font-weight: 400;
 }
 
-.terms-condition {
+.terms-condition a {
   color: #171d23;
   font-size: 11px;
   font-weight: 500;
@@ -69,11 +69,6 @@ p {
   letter-spacing: 0.08333em;
 }
 
-/* .serviceGridContainer > .MuiGrid-item {
-  margin-bottom: 16px;
-  margin-right: 16px;
-} */
-
 .ssl-image {
   position: absolute;
   right: -2rem;
@@ -81,7 +76,6 @@ p {
 }
 
 .ssl-paragraph {
-  /* padding-top: 5rem; */
   color: white;
   width: 80%;
   font-size: 1.8rem;
@@ -135,9 +129,14 @@ a {
   padding: 0 9px 0 0 !important;
 }
 
+.privacy-points li {
+  margin-left: 2rem;
+  padding-top: 0.3rem;
+  font-family: "Roboto", "Helvetica", "Arial", sans-serif;
+}
+
 @media (max-width: 980px) {
   .ssl-paragraph {
-    /* padding-top: 4rem; */
     font-size: 1.5rem;
     width: 100%;
     line-height: 1.6rem;
@@ -159,7 +158,6 @@ a {
   }
 
   .ssl-paragraph {
-    /* padding-top: 4rem; */
     width: 80%;
     font-size: 1.5rem;
     line-height: 1.6rem;

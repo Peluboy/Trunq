@@ -30,12 +30,6 @@
 }
 
 .custom-form-input {
-  /* width: 553px;
-  height: 40px;
-  outline: none;
-  border: 1px solid #a1a1a1;
-  background: #ffffff;
-  border-radius: 5px; */
   display: flex;
   align-items: center;
 }

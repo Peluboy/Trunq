@@ -46,6 +46,16 @@ const Navbar = () => {
     };
   }, []);
 
+  const handleWhatsAppClick = () => {
+    const phoneNumber = "2349038761241";
+    const whatsappUrl = `https://api.whatsapp.com/send?phone=${phoneNumber}`;
+    window.open(whatsappUrl, "_blank");
+  };
+
+  const handleSourceCode = () => {
+    window.open("https://github.com/Peluboy/Trunq", "_blank");
+  };
+
   return (
     <>
       {openAuthModal && <AuthModal onClose={() => setOpenAuthModal(false)} />}
@@ -74,6 +84,7 @@ const Navbar = () => {
                   color="primary"
                   variant="outlined"
                   sx={{ display: { xs: "none", sm: "inline-flex" } }}
+                  onClick={handleSourceCode}
                 >
                   Source Code
                 </Button>
@@ -93,10 +104,10 @@ const Navbar = () => {
                   disableElevation
                   color="primary"
                   variant="outlined"
-                  onClick={() => navigate("/signup")}
+                  onClick={handleWhatsAppClick}
                   sx={{ display: { xs: "none", sm: "inline-flex" } }}
                 >
-                  Pricing Plan
+                  Contact us
                 </Button>
                 <Button
                   disableElevation
@@ -131,6 +142,7 @@ const Navbar = () => {
                       color="primary"
                       variant="outlined"
                       fullWidth
+                      onClick={handleSourceCode}
                     >
                       Source Code
                     </Button>

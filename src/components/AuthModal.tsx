@@ -278,7 +278,9 @@ const AuthModal = ({ onClose }: AuthModalProps) => {
                 onChange={handleCheckboxChange}
               />
               <p className="terms-condition">
-                I agree to Trunq's Privacy and Terms of Use.
+                <a href="/privacy-policy">
+                  I agree to Trunq's Privacy and Terms of Use.
+                </a>
               </p>
             </Box>
           </Box>

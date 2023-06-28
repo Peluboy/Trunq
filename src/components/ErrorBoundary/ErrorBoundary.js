@@ -1,6 +1,4 @@
 import { Component } from "react";
-// import '../../styles/trackorder.css'
-// import '../pages/error.css'
 
 export class ErrorBoundary extends Component {
   constructor(props) {
@@ -13,7 +11,6 @@ export class ErrorBoundary extends Component {
   }
 
   componentDidCatch(error, errorInfo) {
-    // logErrorToMyService(error, errorInfo);
     console.log("logging", error, errorInfo);
   }
 

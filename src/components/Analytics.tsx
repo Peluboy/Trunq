@@ -3,7 +3,7 @@ import { Box, Typography, Grid } from "@mui/material";
 import "../styles/account.css";
 import { AiOutlineLink } from "react-icons/ai";
 import { collection, getDocs } from "firebase/firestore";
-import { firestore } from "../utils/Firebase";
+import { firestore, auth } from "../utils/Firebase";
 import AdsClickIcon from "@mui/icons-material/AdsClick";
 import FmdGoodOutlinedIcon from "@mui/icons-material/FmdGoodOutlined";
 
@@ -12,7 +12,7 @@ export interface AnalyticsProps {
   totalLinks: number;
 }
 
-const Analytics = ({ totalClicks, totalLinks }: AnalyticsProps) => {
+const Analytics = ({ totalLinks }: AnalyticsProps) => {
   const [totalClicksSum, setTotalClicksSum] = useState(0);
   const [topLocation, setTopLocation] = useState("");
 
@@ -23,9 +23,13 @@ const Analytics = ({ totalClicks, totalLinks }: AnalyticsProps) => {
         const linksSnapshot = await getDocs(linksRef);
 
         const promises = linksSnapshot.docs.map(async (doc) => {
-          const { totalClicks } = doc.data();
-          const parsedClicks = parseInt(totalClicks);
-          return isNaN(parsedClicks) ? 0 : parsedClicks;
+          const { totalClicks, userID } = doc.data();
+          if (userID === auth.currentUser?.uid) {
+            const parsedClicks = parseInt(totalClicks);
+            return isNaN(parsedClicks) ? 0 : parsedClicks;
+          } else {
+            return 0;
+          }
         });
 
         const totalClicksArray = await Promise.all(promises);
@@ -36,7 +40,6 @@ const Analytics = ({ totalClicks, totalLinks }: AnalyticsProps) => {
 
         setTotalClicksSum(sum);
 
-        // Update the topLocation value based on the totalClicksSum
         setTopLocation(sum === 0 ? "No Data" : "Nigeria");
       } catch (error) {
         console.error("Error fetching total clicks:", error);

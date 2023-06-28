@@ -45,7 +45,6 @@ export interface LinkCardProps {
   description: string;
   totalClicks: number;
   clickLocation?: string;
-  // geolocation: string;
   deleteLink: (linkDocID: string) => Promise<void>;
   copyLink: (shortUrl: string) => void;
   customURL?: string;
@@ -95,7 +94,6 @@ const TopBar = ({
 }: {
   updateStats: (clicks: number, links: number) => void;
 }) => {
-  // const [newLinkToaster, setNewLinkToaster] = useState(false);
   const [links, setLinks] = useState<Link[]>([]);
   const [openModal, setOpenModal] = useState(false);
   const [value, setValue] = useState(0);
@@ -138,16 +136,6 @@ const TopBar = ({
       link.shortCode = customURL;
     }
 
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        const { latitude, longitude } = position.coords;
-        setClickLocation(`[${latitude}, ${longitude}]`);
-      },
-      (error) => {
-        console.log("Error retrieving location:", error);
-      }
-    );
-
     const linksPathRef = collection(firestore, `users/${link.userID}/links`);
     const resp = await addDoc(linksPathRef, link);
     const linkID = resp.id;
@@ -159,7 +147,7 @@ const TopBar = ({
       linkID: linkID,
       longURL: link.longURL,
       userID: link.userID,
-      shortCode: link.shortCode, // Store the shortCode in the document
+      shortCode: link.shortCode,
     });
 
     const newLink: Link = {
@@ -184,7 +172,7 @@ const TopBar = ({
     const linksPathRef = collection(firestore, `users/${userUid}/links`);
 
     const fetchLinks = async () => {
-      const linksQuery = query(linksPathRef, limit(20)); // Fetch only 20 documents
+      const linksQuery = query(linksPathRef, limit(20));
 
       const querySnapshot = await getDocs(linksQuery);
 
@@ -222,7 +210,7 @@ const TopBar = ({
           createdAt: new Date(
             createdAt.seconds * 1000 + createdAt.nanoseconds / 1000000
           ),
-          totalClicks, // Assign the correct value to totalClicks
+          totalClicks,
           copyLink: handleCopyLink,
           deleteLink: handleDeleteLink,
           customURL: customURL || "",
@@ -235,10 +223,10 @@ const TopBar = ({
           copyLink: handleCopyLink,
           totalClicks: totalClicks,
         });
-        clicks += totalClicks; // Update the totalClicks variable
+        clicks += totalClicks;
 
         // Track number of clicks for each link in the users subcollection
-        const userLinkDocRef = doc.ref; // Use doc.ref to get the document reference
+        const userLinkDocRef = doc.ref;
         const snapshot = await getDoc(userLinkDocRef);
         const updatedTotalClicks = snapshot.data() as { totalClicks: number };
         if (
@@ -298,9 +286,7 @@ const TopBar = ({
   }, []);
 
   const handleCopyLink = useCallback((shortUrl: string) => {
-    // const completeUrl = `https://${shortUrl}`;
     copy(shortUrl);
-    // setNewLinkToaster(true);
     toast.success("Link copied successfully");
   }, []);
 
