@@ -165,10 +165,10 @@ const Navbar = () => {
                       disableElevation
                       color="primary"
                       variant="outlined"
-                      onClick={() => navigate("/signup")}
+                      onClick={handleWhatsAppClick}
                       fullWidth
                     >
-                      Pricing Plan
+                      Contact us
                     </Button>
                   </MenuItem>
                   <MenuItem onClick={handleMenuClose}>
