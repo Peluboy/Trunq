@@ -1,3 +1,8 @@
+import React, { useState, useEffect, memo } from "react";
+import { LinkCardProps } from "../components/TopBar";
+import format from "date-fns/format";
+import { isValid } from "date-fns";
+import { LinkPreview } from "@dhaiwat10/react-link-preview";
 import {
   Box,
   Typography,
@@ -8,10 +13,6 @@ import {
 import DeleteIcon from "@mui/icons-material/Delete";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import SignalCellularAltIcon from "@mui/icons-material/SignalCellularAlt";
-import { LinkCardProps } from "../components/TopBar";
-import format from "date-fns/format";
-import { isValid } from "date-fns";
-import { useState, useEffect, memo } from "react";
 import {
   getDocs,
   getDoc,
@@ -39,6 +40,7 @@ const LinkCard = ({
   const [displayTotalClicks, setDisplayTotalClicks] = useState<number | null>(
     null
   );
+  const [longUrlPreview, setLongUrlPreview] = useState(null);
 
   const handleDeleteLink = async () => {
     await deleteLink(id);
@@ -106,39 +108,41 @@ const LinkCard = ({
   }, []);
 
   return (
-    <>
-      <Box
-        display="flex"
-        justifyContent="space-between"
-        alignItems="center"
-        bgcolor="#fff"
-        p={isMobile ? "1rem" : "1.5rem 2rem"}
-        borderRadius="8px"
-        mb="1rem"
-        boxShadow="rgba(0, 0, 0, 0.04) 0px 3px 5px;"
-      >
-        <Box width="50%">
+    <Box
+      display="flex"
+      justifyContent="space-between"
+      alignItems="center"
+      bgcolor="#fff"
+      p={isMobile ? "1rem" : "1.5rem 2rem"}
+      borderRadius="8px"
+      mb="1rem"
+      boxShadow="rgba(0, 0, 0, 0.04) 0px 3px 5px;"
+    >
+      <Box width="50%">
+        <Typography
+          variant="overline"
+          color="textSecondary"
+          fontSize={isMobile ? "10px" : "12px"}
+        >
+          {" "}
+          Created at {createdAt ? formatCreatedAt(createdAt) : ""}
+        </Typography>
+        <Box>
+          <Typography variant="h5">{name}</Typography>{" "}
           <Typography
-            variant="overline"
-            color="textSecondary"
-            fontSize={isMobile ? "10px" : "12px"}
+            variant="body2"
+            style={{ overflow: "hidden", textOverflow: "ellipsis" }}
+            textTransform="none"
+            pt={0.5}
           >
-            {" "}
-            Created at {createdAt ? formatCreatedAt(createdAt) : ""}
+            {longURL}
           </Typography>
-          <Box>
-            <Typography variant="h5">{name}</Typography>{" "}
-            <Typography
-              variant="body2"
-              style={{ overflow: "hidden", textOverflow: "ellipsis" }}
-              textTransform="none"
-              pt={0.5}
-            >
-              {longURL}
-            </Typography>
-          </Box>
+        </Box>
 
-          <Box mt={isMobile ? ".8rem" : "1rem"}>
+        <Box mt={isMobile ? ".8rem" : "1rem"}>
+          {longUrlPreview ? (
+            <LinkPreview url={longURL} />
+          ) : (
             <Tooltip title={longURL} arrow placement="top">
               <Typography
                 variant="body2"
@@ -149,41 +153,41 @@ const LinkCard = ({
                 {shortUrl}
               </Typography>
             </Tooltip>
-          </Box>
-        </Box>
-        <Box display="flex" alignItems="center">
-          <Typography variant="body2" fontSize={isMobile ? "16px" : "20px"}>
-            {displayTotalClicks !== null ? displayTotalClicks : ""}
-          </Typography>{" "}
-          <Tooltip
-            title={
-              displayTotalClicks !== null
-                ? `Top Location: ${displayTotalClicks > 0 ? topLocation : ""}`
-                : ""
-            }
-            arrow
-            placement="top"
-          >
-            <IconButton sx={{ marginRight: isMobile ? "-10px" : "-8px" }}>
-              <SignalCellularAltIcon fontSize="small" color="success" />
-            </IconButton>
-          </Tooltip>
-          <Tooltip title="Copy" arrow placement="top">
-            <IconButton
-              onClick={() => copyLink(shortUrl)}
-              sx={{ marginRight: isMobile ? "-10px" : "-8px" }}
-            >
-              <ContentCopyIcon fontSize="small" color="success" />
-            </IconButton>
-          </Tooltip>
-          <Tooltip title="Delete" arrow placement="top">
-            <IconButton onClick={handleDeleteLink}>
-              <DeleteIcon fontSize="small" color="success" />
-            </IconButton>
-          </Tooltip>
+          )}
         </Box>
       </Box>
-    </>
+      <Box display="flex" alignItems="center">
+        <Typography variant="body2" fontSize={isMobile ? "16px" : "20px"}>
+          {displayTotalClicks !== null ? displayTotalClicks : ""}
+        </Typography>{" "}
+        <Tooltip
+          title={
+            displayTotalClicks !== null
+              ? `Top Location: ${displayTotalClicks > 0 ? topLocation : ""}`
+              : ""
+          }
+          arrow
+          placement="top"
+        >
+          <IconButton sx={{ marginRight: isMobile ? "-10px" : "-8px" }}>
+            <SignalCellularAltIcon fontSize="small" color="success" />
+          </IconButton>
+        </Tooltip>
+        <Tooltip title="Copy" arrow placement="top">
+          <IconButton
+            onClick={() => copyLink(shortUrl)}
+            sx={{ marginRight: isMobile ? "-10px" : "-8px" }}
+          >
+            <ContentCopyIcon fontSize="small" color="success" />
+          </IconButton>
+        </Tooltip>
+        <Tooltip title="Delete" arrow placement="top">
+          <IconButton onClick={handleDeleteLink}>
+            <DeleteIcon fontSize="small" color="success" />
+          </IconButton>
+        </Tooltip>
+      </Box>
+    </Box>
   );
 };
 

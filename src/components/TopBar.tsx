@@ -1,4 +1,5 @@
 import React, { useEffect, useCallback, useState } from "react";
+// import { openGraph } from "open-graph";
 import "../styles/account.css";
 import {
   Box,
@@ -101,7 +102,7 @@ const TopBar = ({
   const [totalClicks, setTotalClicks] = useState(0);
   const [totalLinks, setTotalLinks] = useState(0);
   const [customUrl, setCustomUrl] = useState("");
-  const [clickLocation, setClickLocation] = useState("");
+  // const [clickLocation, setClickLocation] = useState("");
 
   const isMobile = useMediaQuery("(max-width: 600px)");
 
@@ -126,7 +127,7 @@ const TopBar = ({
       createdAt: new Date(),
       totalClicks: 0,
       description: "",
-      clickLocation: clickLocation,
+      // clickLocation: clickLocation,
       userID: auth.currentUser?.uid,
     };
 
@@ -162,11 +163,9 @@ const TopBar = ({
 
     setLinks((prevLinks) => [...prevLinks, newLink]);
     setOpenModal(false);
-
-    setTotalClicks((prevTotalClicks) => prevTotalClicks + 1);
-    setTotalLinks((prevTotalLinks) => prevTotalLinks + 1);
   };
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     const userUid = auth.currentUser?.uid;
     const linksPathRef = collection(firestore, `users/${userUid}/links`);
@@ -255,8 +254,9 @@ const TopBar = ({
     };
 
     fetchLinks();
-  }, [auth.currentUser?.uid, links]);
+  }, [auth.currentUser?.uid, links, updateStats]);
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const handleDeleteLink = useCallback(async (linkDocID: string) => {
     const { currentUser } = auth;
     if (window.confirm("Are you sure you want to delete this link?⚠️")) {
@@ -266,7 +266,7 @@ const TopBar = ({
         const linkDocSnapshot = await getDoc(linkDocRef);
 
         if (linkDocSnapshot.exists()) {
-          const { linkID, shortCode } = linkDocSnapshot.data() as {
+          const { shortCode } = linkDocSnapshot.data() as {
             linkID?: string;
             shortCode?: string;
           };
@@ -389,6 +389,7 @@ const TopBar = ({
                       key={link.id}
                       {...link}
                       deleteLink={handleDeleteLink}
+                      totalClicks={totalClicks}
                       copyLink={handleCopyLink}
                       clickLocation={link.clickLocation}
                     />
