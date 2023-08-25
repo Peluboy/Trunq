@@ -14,12 +14,12 @@ import {
 } from "@mui/material";
 import { GrClose } from "react-icons/gr";
 import { MdVisibility, MdVisibilityOff } from "react-icons/md";
-import { FaGoogle } from "react-icons/fa";
 import isEmail from "validator/lib/isEmail";
 import { Link } from "react-router-dom";
 import { styled } from "@mui/material/styles";
 import { useAuth } from "../contexts/AuthContext";
 import { Divider } from "@mui/material";
+import GoogleIcon from "./GoogleIcon";
 
 const BpIcon = styled("span")(({ theme }) => ({
   borderRadius: 3,
@@ -271,7 +271,7 @@ const AuthModal = ({ onClose }: AuthModalProps) => {
           <Button
             onClick={handleGoogleSignIn}
             variant="outlined"
-            startIcon={<FaGoogle />}
+            startIcon={<GoogleIcon />}
           >
             Sign In with Google
           </Button>

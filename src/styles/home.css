@@ -135,6 +135,16 @@ a {
   font-family: "Roboto", "Helvetica", "Arial", sans-serif;
 }
 
+.google-icon {
+  display: flex;
+  align-items: center;
+  padding: 0.3rem 0;
+}
+
+.LgbsSe-Bz112c {
+  width: 1.2rem;
+}
+
 @media (max-width: 980px) {
   .ssl-paragraph {
     font-size: 1.5rem;
