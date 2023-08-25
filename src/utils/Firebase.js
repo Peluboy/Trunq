@@ -1,5 +1,9 @@
 import { initializeApp } from "firebase/app";
-import { getAuth, connectAuthEmulator } from "firebase/auth";
+import {
+  getAuth,
+  connectAuthEmulator,
+  GoogleAuthProvider,
+} from "firebase/auth";
 import { getAnalytics, isSupported } from "firebase/analytics";
 import { getFirestore, connectFirestoreEmulator } from "firebase/firestore";
 
@@ -17,6 +21,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const firestore = getFirestore(app);
+const provider = new GoogleAuthProvider();
 
 let analytics = null;
 
@@ -29,4 +34,4 @@ if (process.env.NODE_ENV === "development") {
   connectFirestoreEmulator(firestore, "localhost", 8080);
 }
 
-export { app, auth, firestore, analytics };
+export { app, auth, firestore, analytics, provider };

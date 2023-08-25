@@ -14,10 +14,12 @@ import {
 } from "@mui/material";
 import { GrClose } from "react-icons/gr";
 import { MdVisibility, MdVisibilityOff } from "react-icons/md";
+import { FaGoogle } from "react-icons/fa";
 import isEmail from "validator/lib/isEmail";
 import { Link } from "react-router-dom";
 import { styled } from "@mui/material/styles";
 import { useAuth } from "../contexts/AuthContext";
+import { Divider } from "@mui/material";
 
 const BpIcon = styled("span")(({ theme }) => ({
   borderRadius: 3,
@@ -92,7 +94,7 @@ type AuthModalProps = {
 };
 
 const AuthModal = ({ onClose }: AuthModalProps) => {
-  const { login, register } = useAuth();
+  const { login, register, handleGoogleSignIn, currentUser } = useAuth();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -184,6 +186,12 @@ const AuthModal = ({ onClose }: AuthModalProps) => {
     resetForm();
   };
 
+  useEffect(() => {
+    if (currentUser) {
+      onClose({}, "success");
+    }
+  }, [currentUser]);
+
   return (
     <Dialog open fullWidth onClose={onClose}>
       <Box
@@ -257,6 +265,16 @@ const AuthModal = ({ onClose }: AuthModalProps) => {
               }}
             />
           </Box>
+          <Box mt={2} textAlign="center">
+            <Divider sx={{ my: 1 }}>or</Divider>
+          </Box>
+          <Button
+            onClick={handleGoogleSignIn}
+            variant="outlined"
+            startIcon={<FaGoogle />}
+          >
+            Sign In with Google
+          </Button>
         </Box>
         {isSignIn && (
           <Box mt={2} display="flex" justifyContent="flex-start">

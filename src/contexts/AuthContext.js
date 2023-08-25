@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
-import { auth } from "../utils/Firebase";
+import { auth, provider } from "../utils/Firebase";
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
@@ -7,6 +7,7 @@ import {
   onAuthStateChanged,
   signOut,
   confirmPasswordReset,
+  signInWithPopup,
 } from "firebase/auth";
 
 const AuthContext = createContext({
@@ -16,6 +17,7 @@ const AuthContext = createContext({
   logout: () => Promise,
   forgotPassword: (email) => Promise,
   resetPassword: (oobCode, newPassword) => Promise,
+  handleGoogleSignIn: () => Promise,
 });
 
 export const useAuth = () => useContext(AuthContext);
@@ -35,6 +37,15 @@ export default function AuthContextProvider({ children }) {
   useEffect(() => {
     console.log("The user is", currentUser);
   }, [currentUser]);
+
+  async function handleGoogleSignIn() {
+    try {
+      const result = await signInWithPopup(auth, provider);
+      return { success: true };
+    } catch (error) {
+      throw error;
+    }
+  }
 
   async function login(email, password) {
     try {
@@ -147,6 +158,7 @@ export default function AuthContextProvider({ children }) {
     logout,
     forgotPassword,
     resetPassword,
+    handleGoogleSignIn,
   };
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

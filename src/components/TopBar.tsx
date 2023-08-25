@@ -45,7 +45,7 @@ export interface LinkCardProps {
   shortCode: string;
   description: string;
   totalClicks: number;
-  clickLocation?: string;
+  clickLocation?: string[];
   deleteLink: (linkDocID: string) => Promise<void>;
   copyLink: (shortUrl: string) => void;
   customURL?: string;
@@ -55,6 +55,7 @@ export interface Link extends LinkCardProps {
   deleteLink: (linkDocID: string) => Promise<void>;
   copyLink: (shortUrl: string) => void;
   totalClicks: number;
+  clickLocation?: string[];
 }
 
 interface TabPanelProps {
@@ -127,7 +128,7 @@ const TopBar = ({
       createdAt: new Date(),
       totalClicks: 0,
       description: "",
-      // clickLocation: clickLocation,
+      clickLocation: [],
       userID: auth.currentUser?.uid,
     };
 
