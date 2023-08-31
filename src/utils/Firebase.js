@@ -6,6 +6,7 @@ import {
 } from "firebase/auth";
 import { getAnalytics, isSupported } from "firebase/analytics";
 import { getFirestore, connectFirestoreEmulator } from "firebase/firestore";
+import { getStorage } from "firebase/storage";
 
 const firebaseConfig = {
   apiKey: process.env.REACT_APP_API_KEY,
@@ -20,6 +21,7 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
+const storage = getStorage(app);
 const firestore = getFirestore(app);
 const provider = new GoogleAuthProvider();
 
@@ -34,4 +36,4 @@ if (process.env.NODE_ENV === "development") {
   connectFirestoreEmulator(firestore, "localhost", 8080);
 }
 
-export { app, auth, firestore, analytics, provider };
+export { app, auth, firestore, analytics, provider, storage };

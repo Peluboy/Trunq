@@ -64,7 +64,9 @@ const Analytics = ({ totalLinks }: AnalyticsProps) => {
                 <Box pt=".2rem" mr=".8rem">
                   <AiOutlineLink size="18px" color="#a1a1a1" />
                 </Box>
-                <Typography variant="h4">{totalLinks}</Typography>
+                <Typography variant="h4" fontSize="1.6rem">
+                  {totalLinks}
+                </Typography>
               </Box>
               <Box ml="2rem">
                 <Typography variant="body2">Total Links</Typography>
@@ -76,7 +78,9 @@ const Analytics = ({ totalLinks }: AnalyticsProps) => {
                 <Box pt=".2rem" mr=".8rem">
                   <AdsClickIcon fontSize="small" color="success" />
                 </Box>
-                <Typography variant="h4">{totalClicksSum}</Typography>
+                <Typography variant="h4" fontSize="1.6rem">
+                  {totalClicksSum}
+                </Typography>
               </Box>
               <Box ml="2rem">
                 <Typography variant="body2">Total Clicks</Typography>
@@ -88,7 +92,9 @@ const Analytics = ({ totalLinks }: AnalyticsProps) => {
                 <Box pt=".2rem" mr=".8rem">
                   <FmdGoodOutlinedIcon fontSize="small" color="success" />
                 </Box>
-                <Typography variant="h4">{topLocation}</Typography>
+                <Typography variant="h4" fontSize="1.6rem">
+                  {topLocation}
+                </Typography>
               </Box>
               <Box ml="2rem">
                 <Typography variant="body2">Top Location</Typography>

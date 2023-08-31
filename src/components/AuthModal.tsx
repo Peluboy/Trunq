@@ -265,7 +265,7 @@ const AuthModal = ({ onClose }: AuthModalProps) => {
               }}
             />
           </Box>
-          <Box mt={2} textAlign="center">
+          <Box textAlign="center">
             <Divider sx={{ my: 1 }}>or</Divider>
           </Box>
           <Button

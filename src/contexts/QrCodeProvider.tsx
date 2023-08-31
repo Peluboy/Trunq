@@ -32,7 +32,7 @@ const QrCodeProvider = ({ children }: { children: ReactNode }) => {
       const size = window.innerWidth < 600 ? 200 : 120;
       const bodyParameters = {
         size,
-        qrData: "pattern3",
+        qrData: "pattern4",
         colorDark: "#1b1b1b",
         qrCategory: "url",
         text: link,
