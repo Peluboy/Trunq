@@ -2,7 +2,6 @@ import "../../styles/home.css";
 import {
   Typography,
   Box,
-  Button,
   AvatarGroup,
   Avatar,
   Rating,
@@ -61,7 +60,7 @@ const Hero = () => {
               {" "}
               BIO LINK & LINK <br />
               SHORTENER <img src={TrunqHero} alt="" /> FOR
-              {/* <br /> */} BUSINESS NEEDS
+              BUSINESS NEEDS
             </Typography>
             <p className="hero-paragraph">
               On a single platform, you’ll find all the tools you need to
@@ -69,19 +68,6 @@ const Hero = () => {
               create QR codes and also create brand relationships.
             </p>
           </Box>
-          {/* <Box pt={5} display="flex" gap={2} sx={{ paddingBottom: "1rem" }}>
-            <Button
-              variant="contained"
-              disableElevation
-              size="large"
-              onClick={() => setOpenAuthModal(true)}
-            >
-              Get Started for Free
-            </Button>
-            <Button variant="outlined" disableElevation>
-              Get a Quote
-            </Button>
-          </Box> */}
           <Box
             display="flex"
             justifyContent="flex-start"

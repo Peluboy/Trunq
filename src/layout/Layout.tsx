@@ -1,10 +1,10 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import Routers from "../routers/Routers";
 import Navbar from "../components/Navbar";
 import { auth } from "../utils/Firebase";
 
 const Layout = () => {
-  const [updatedDisplayName, setUpdatedDisplayName] = useState<string | null>(
+  const [updatedDisplayName] = useState<string | null>(
     auth.currentUser?.displayName || null
   );
   return (

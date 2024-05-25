@@ -14,25 +14,17 @@ import MenuIcon from "@mui/icons-material/Menu";
 import TrunqLogo from "../assets/images/trunqLogo.svg";
 import "../styles/account.css";
 import { auth } from "../utils/Firebase";
-// import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import AuthModal from "./AuthModal";
 import { Link } from "react-router-dom";
 import UserProfile from "../components/UserProfile";
 
 const Navbar = ({ displayName }: { displayName: string | null }) => {
-  // const navigate = useNavigate();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [openAuthModal, setOpenAuthModal] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
   const [isGmailUser, setIsGmailUser] = useState(false);
   const [profileDrawerOpen, setProfileDrawerOpen] = useState(false);
-
-  // const handleLogout = () => {
-  //   auth.signOut().then(() => {
-  //     navigate("/home");
-  //   });
-  // };
 
   const handleMenuClick = (event: any) => {
     setAnchorEl(event.currentTarget);
@@ -64,10 +56,6 @@ const Navbar = ({ displayName }: { displayName: string | null }) => {
     const whatsappUrl = `https://api.whatsapp.com/send?phone=${phoneNumber}`;
     window.open(whatsappUrl, "_blank");
   };
-
-  // const handleSourceCode = () => {
-  //   window.open("https://github.com/Peluboy/Trunq", "_blank");
-  // };
 
   const user = auth.currentUser;
 
@@ -146,15 +134,7 @@ const Navbar = ({ displayName }: { displayName: string | null }) => {
                     <MenuIcon />
                   </IconButton>
                 </Box>
-                {/* <Button
-                  disableElevation
-                  color="primary"
-                  variant="outlined"
-                  sx={{ display: { xs: "none", sm: "inline-flex" } }}
-                  onClick={handleSourceCode}
-                >
-                  Source Code
-                </Button> */}
+
                 <Box>
                   <Button
                     disableElevation

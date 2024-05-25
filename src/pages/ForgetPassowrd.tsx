@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
   Button,
   Box,
@@ -7,7 +7,7 @@ import {
   CircularProgress,
 } from "@mui/material";
 import { useNavigate, Link } from "react-router-dom";
-import { BsArrowLeft, BsCheckCircle } from "react-icons/bs";
+import { BsArrowLeft } from "react-icons/bs";
 import { useAuth } from "../contexts/AuthContext";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -17,7 +17,7 @@ const ForgetPassword = () => {
 
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  const [ , setError] = useState("");
   const [emailSent, setEmailSent] = useState(false);
 
   const navigate = useNavigate();

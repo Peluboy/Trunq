@@ -1,5 +1,4 @@
-import React, { useState, useEffect, memo } from "react";
-import { LinkCardProps } from "../components/TopBar";
+import { useState, useEffect, memo } from "react";
 import format from "date-fns/format";
 import { isValid } from "date-fns";
 import { LinkPreview } from "@dhaiwat10/react-link-preview";
@@ -23,6 +22,7 @@ import {
   limit,
 } from "firebase/firestore";
 import { firestore } from "../utils/Firebase";
+import { LinkCardProps } from "../types/types";
 
 const LinkCard = ({
   id,
@@ -34,13 +34,13 @@ const LinkCard = ({
   customURL,
 }: LinkCardProps) => {
   const [createdAt, setCreatedAt] = useState<Date | null>(null);
-  const [linkTotalClicks, setLinkTotalClicks] = useState<number | null>(null);
+  const [ , setLinkTotalClicks] = useState<number | null>(null);
   const [topLocation, setTopLocation] = useState("Nigeria");
   const isMobile = useMediaQuery("(max-width: 600px)");
   const [displayTotalClicks, setDisplayTotalClicks] = useState<number | null>(
     null
   );
-  const [longUrlPreview, setLongUrlPreview] = useState(null);
+  const [longUrlPreview, ] = useState(null);
 
   const handleDeleteLink = async () => {
     await deleteLink(id);

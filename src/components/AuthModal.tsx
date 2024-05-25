@@ -93,15 +93,15 @@ type AuthModalProps = {
   ) => void;
 };
 
+
 const AuthModal = ({ onClose }: AuthModalProps) => {
   const { login, register, handleGoogleSignIn, currentUser } = useAuth();
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isSignIn, setIsSignIn] = useState(true);
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
-  const [firebaseError, setFirebaseError] = useState("");
+  const [ , setFirebaseError] = useState("");
   const [isCheckboxChecked, setIsCheckboxChecked] = useState(false);
 
   const [form, setForm] = useState({
@@ -141,16 +141,16 @@ const AuthModal = ({ onClose }: AuthModalProps) => {
     } catch (error: any) {
       let errorMessage = "";
       switch (error.code) {
-        case "email-in-use":
+        case "auth/email-already-in-use":
           setEmailError(error.message);
           break;
-        case "invalid-email":
+        case "auth/invalid-email":
           setEmailError(error.message);
           break;
-        case "user-not-found":
+        case "auth/user-not-found":
           setEmailError(error.message);
           break;
-        case "wrong-password":
+        case "auth/wrong-password":
           setPasswordError(error.message);
           break;
         default:
@@ -159,6 +159,23 @@ const AuthModal = ({ onClose }: AuthModalProps) => {
       }
 
       setFirebaseError(errorMessage);
+      setLoading(false);
+    }
+  };
+
+  const handleGoogleSignInClick = async () => {
+    setLoading(true);
+    setFirebaseError("");
+    try {
+      await handleGoogleSignIn();
+      onClose({}, "success");
+    } catch (error: any) {
+      if (error.code === "auth/popup-closed-by-user") {
+        console.error("Popup closed by user.");
+      } else {
+        console.error("Google Sign-In Error:", error.message);
+      }
+      setFirebaseError(error.message);
       setLoading(false);
     }
   };
@@ -181,7 +198,6 @@ const AuthModal = ({ onClose }: AuthModalProps) => {
   };
 
   const handleToggleMode = () => {
-    // setIsSignIn((prevState) => !prevState);
     setIsSignIn((o) => !o);
     resetForm();
   };
@@ -190,7 +206,7 @@ const AuthModal = ({ onClose }: AuthModalProps) => {
     if (currentUser) {
       onClose({}, "success");
     }
-  }, [currentUser]);
+  }, [currentUser, onClose]);
 
   return (
     <Dialog open fullWidth onClose={onClose}>
@@ -228,9 +244,7 @@ const AuthModal = ({ onClose }: AuthModalProps) => {
               size="small"
               error={!!emailError}
               helperText={emailError || ""}
-            >
-              Email
-            </TextField>
+            />
           </Box>
           <Box display="flex" flexDirection="column">
             <Typography variant="overline">Password</Typography>
