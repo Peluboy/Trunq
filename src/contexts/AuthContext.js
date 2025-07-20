@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
-import { auth, provider } from "../utils/Firebase";
+import { auth } from "../utils/Firebase";
+import { provider } from "../utils/Firebase";
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,

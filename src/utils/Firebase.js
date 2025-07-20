@@ -1,4 +1,4 @@
-import { initializeApp } from "firebase/app";
+import { initializeApp, getApps, getApp } from "firebase/app";
 import {
   getAuth,
   connectAuthEmulator,
@@ -17,9 +17,11 @@ const firebaseConfig = {
   appId: process.env.REACT_APP_APP_ID,
   measurementId: process.env.REACT_APP_MEASUREMENT_ID,
 };
-
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
+console.log("FIREBASE CONFIG:", firebaseConfig);
+if (Object.values(firebaseConfig).some((value) => !value)) {
+  throw new Error("Firebase config is missing environment variables");
+}
+const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const storage = getStorage(app);
 const firestore = getFirestore(app);
@@ -31,9 +33,9 @@ if (isSupported()) {
   analytics = getAnalytics(app);
 }
 
-if (process.env.NODE_ENV === "development") {
-  connectAuthEmulator(auth, "http://localhost:9099");
-  connectFirestoreEmulator(firestore, "localhost", 8080);
-}
+// if (process.env.NODE_ENV === "development") {
+//   connectAuthEmulator(auth, "http://localhost:9099");
+//   connectFirestoreEmulator(firestore, "localhost", 8080);
+// }
 
 export { app, auth, firestore, analytics, provider, storage };

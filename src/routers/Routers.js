@@ -49,7 +49,7 @@ const Routers = () => {
       <Route path="/" element={<Navigate to="/home" />} />
       <Route path="/home" element={user ? <Navigate to="/dashboard" /> : <Home />} />
       <Route path="/dashboard" element={user ? <Account /> : <Navigate to="/home" />} />
-      <Route path="/:shortCode" element={<Redirect />} />
+      {/* <Route path="/:shortCode" element={<Redirect />} /> */}
       <Route path="*" element={<LayoutRoutes />} />
     </Routes>
   );

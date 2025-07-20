@@ -1,0 +1,5 @@
+{
+    "rewrites": [
+      { "source": "/:shortCode", "destination": "/api/redirect.cjs?shortCode=:shortCode"}
+    ]
+  }

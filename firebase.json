@@ -7,10 +7,8 @@
         "node_modules",
         ".git",
         "firebase-debug.log",
-        "firebase-debug.*.log"
-      ],
-      "predeploy": [
-        "npm --prefix \"$RESOURCE_DIR\" run build"
+        "firebase-debug.*.log",
+        "*.local"
       ]
     }
   ],
@@ -38,8 +36,8 @@
     ],
     "rewrites": [
       {
-        "source": "**",
-        "destination": "/index.html"
+        "source": "/**",
+        "function": "redirect"
       }
     ]
   }
