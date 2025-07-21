@@ -59,6 +59,8 @@ const LinkCard = ({
   const [displayTotalClicks, setDisplayTotalClicks] = useState<number | null>(
     null
   );
+  const [fetchedClickLocation, setFetchedClickLocation] = useState<any[]>([]);
+
   const [longUrlPreview, ] = useState(null);
   const [editOpen, setEditOpen] = useState(false);
   const [editUrl, setEditUrl] = useState(longURL);
@@ -162,16 +164,38 @@ const LinkCard = ({
     fetchTopLocation();
   }, []);
 
+  useEffect(() => {
+    const fetchClickLocation = async () => {
+      try {
+        const linkDocRef = doc(firestore, "links", shortCode);
+        const linkDocSnapshot = await getDoc(linkDocRef);
+        if (linkDocSnapshot.exists()) {
+          const data = linkDocSnapshot.data();
+          if (data.clickLocation && Array.isArray(data.clickLocation)) {
+            setFetchedClickLocation(data.clickLocation);
+          } else {
+            setFetchedClickLocation([]);
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching click location:", error);
+      }
+    };
+  
+    fetchClickLocation();
+  }, [shortCode]);
+  
+
   // Analytics summary and chart data
-  const totalClicks = clickLocation.length;
-  const countryCounts = clickLocation.reduce((acc: Record<string, number>, loc: any) => {
+  const totalClicks = fetchedClickLocation.length;
+  const countryCounts = fetchedClickLocation.reduce((acc: Record<string, number>, loc: any) => {
     const country = loc.country || 'Unknown';
     acc[country] = (acc[country] || 0) + 1;
     return acc;
   }, {});
   const uniqueCountries = Object.keys(countryCounts);
   const chartData = uniqueCountries.map(country => ({ country, clicks: countryCounts[country] }));
-
+console.log('fetched country:',countryCounts)
   return (
     <Box
       display="flex"
@@ -270,11 +294,11 @@ const LinkCard = ({
       </Dialog>
       {/* Analytics Modal */}
       <Dialog open={analyticsOpen} onClose={handleAnalyticsClose} fullWidth maxWidth="sm">
-        <DialogTitle>Click Analytics</DialogTitle>
+        <DialogTitle style={{ textTransform: 'none' }}>Click Analytics</DialogTitle>
         <DialogContent>
           <Box mb={2}>
           <Typography variant="subtitle2">
-  Total Clicks: {typeof displayTotalClicks === 'number' ? displayTotalClicks : 0}
+  Total Clicks: {typeof totalClicks === 'number' ? totalClicks : 0}
 </Typography>
             <Typography variant="subtitle2">Unique Countries: {uniqueCountries.length}</Typography>
           </Box>
@@ -290,7 +314,7 @@ const LinkCard = ({
               </ResponsiveContainer>
             </Box>
           )}
-{clickLocation.length === 0 ? (
+{fetchedClickLocation.length === 0 ? (
   <Typography variant="body2">No click data yet.</Typography>
 ) : (
   <TableContainer component={Paper}>
