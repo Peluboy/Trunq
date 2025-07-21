@@ -298,8 +298,8 @@ console.log('fetched country:',countryCounts)
         <DialogContent>
           <Box mb={2}>
           <Typography variant="subtitle2">
-  Total Clicks: {typeof totalClicks === 'number' ? totalClicks : 0}
-</Typography>
+            Total Clicks: {typeof totalClicks === 'number' ? totalClicks : 0}
+          </Typography>
             <Typography variant="subtitle2">Unique Countries: {uniqueCountries.length}</Typography>
           </Box>
           {chartData.length > 0 && (
@@ -314,38 +314,39 @@ console.log('fetched country:',countryCounts)
               </ResponsiveContainer>
             </Box>
           )}
-{fetchedClickLocation.length === 0 ? (
-  <Typography variant="body2">No click data yet.</Typography>
-) : (
-  <TableContainer component={Paper}>
-    <Table size="small">
-      <TableHead>
-        <TableRow>
-          <TableCell>Country</TableCell>
-          <TableCell>City</TableCell>
-          <TableCell>Timestamp</TableCell>
-        </TableRow>
-      </TableHead>
-      <TableBody>
-        {clickLocation.slice().reverse().map((loc: any, idx: number) => (
-          <TableRow key={idx}>
-            <TableCell>{loc.country || "Unknown"}</TableCell>
-            <TableCell>{loc.city || ""}</TableCell>
-            <TableCell>
-              {loc.timestamp
-                ? new Date(
-                    loc.timestamp.seconds
-                      ? loc.timestamp.seconds * 1000
-                      : loc.timestamp
-                  ).toLocaleString()
-                : ""}
-            </TableCell>
-          </TableRow>
-        ))}
-      </TableBody>
-    </Table>
-  </TableContainer>
-)}
+          {fetchedClickLocation.length === 0 ? (
+            <Typography variant="body2">No click data yet.</Typography>
+          ) : (
+            <TableContainer>
+              <Table size="small">
+                <TableHead>
+                  <TableRow>
+                    <TableCell>Country</TableCell>
+                    <TableCell>City</TableCell>
+                    <TableCell>Timestamp</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                {fetchedClickLocation.slice().reverse().map((loc: any, idx: number) => (
+            <TableRow key={idx}>
+              <TableCell>{loc.country || "Unknown"}</TableCell>
+              <TableCell>{loc.city || ""}</TableCell>
+              <TableCell>
+                {loc.timestamp
+                  ? new Date(
+                      loc.timestamp.seconds
+                        ? loc.timestamp.seconds * 1000
+                        : loc.timestamp
+                    ).toLocaleDateString()
+                  : ""}
+              </TableCell>
+            </TableRow>
+          ))}
+
+                </TableBody>
+              </Table>
+            </TableContainer>
+          )}
         </DialogContent>
         <DialogActions>
           <Button onClick={handleAnalyticsClose}>Close</Button>
