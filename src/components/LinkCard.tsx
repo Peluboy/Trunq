@@ -1,7 +1,6 @@
 import { useState, useEffect, memo } from "react";
 import format from "date-fns/format";
 import { isValid } from "date-fns";
-import { LinkPreview } from "@dhaiwat10/react-link-preview";
 import {
   Box,
   Typography,
@@ -142,7 +141,7 @@ const LinkCard = ({
 
     fetchLinkTotalClicks();
   }, [shortCode]);
-  console.log(clickLocation)
+
   useEffect(() => {
     const fetchTopLocation = async () => {
       const locationQuery = query(
@@ -154,7 +153,6 @@ const LinkCard = ({
 
       if (!locationSnapshot.empty) {
         const topLocationData = locationSnapshot.docs[0].data();
-        console.log("Top Location Data:", topLocationData);
         setTopLocation(topLocationData.name);
       } else {
         console.log("No location data found.");
@@ -195,7 +193,16 @@ const LinkCard = ({
   }, {});
   const uniqueCountries = Object.keys(countryCounts);
   const chartData = uniqueCountries.map(country => ({ country, clicks: countryCounts[country] }));
-console.log('fetched country:',countryCounts)
+
+  // Referrer analytics
+  const referrerCounts = fetchedClickLocation.reduce((acc: Record<string, number>, loc: any) => {
+    const ref = loc.referrer || 'Direct/Unknown';
+    acc[ref] = (acc[ref] || 0) + 1;
+    return acc;
+  }, {});
+  const referrerData = Object.entries(referrerCounts)
+    .map(([referrer, count]) => ({ referrer, count }))
+    .sort((a, b) => b.count - a.count);
   return (
     <Box
       display="flex"
@@ -229,20 +236,17 @@ console.log('fetched country:',countryCounts)
         </Box>
 
         <Box mt={isMobile ? ".8rem" : "1rem"}>
-          {longUrlPreview ? (
-            <LinkPreview url={longURL} />
-          ) : (
-            <Tooltip title={longURL} arrow placement="top">
-              <Typography
-                variant="body2"
-                color="primary"
-                textTransform="none"
-                fontSize={isMobile ? "11px" : "14px"}
-              >
-                {shortUrl}
-              </Typography>
-            </Tooltip>
-          )}
+          <Tooltip title={longURL} arrow placement="top">
+            <Typography
+              variant="body2"
+              color="primary"
+              textTransform="none"
+              fontSize={isMobile ? "11px" : "14px"}
+              mt={1}
+            >
+              {shortUrl}
+            </Typography>
+          </Tooltip>
         </Box>
         <Box mt=".5rem">
         {expiresAt && (
@@ -297,9 +301,9 @@ console.log('fetched country:',countryCounts)
         <DialogTitle style={{ textTransform: 'none' }}>Click Analytics</DialogTitle>
         <DialogContent>
           <Box mb={2}>
-          <Typography variant="subtitle2">
-            Total Clicks: {typeof totalClicks === 'number' ? totalClicks : 0}
-          </Typography>
+            <Typography variant="subtitle2">
+              Total Clicks: {typeof totalClicks === 'number' ? totalClicks : 0}
+            </Typography>
             <Typography variant="subtitle2">Unique Countries: {uniqueCountries.length}</Typography>
           </Box>
           {chartData.length > 0 && (
@@ -312,6 +316,29 @@ console.log('fetched country:',countryCounts)
                   <Bar dataKey="clicks" fill="#1976d2" />
                 </BarChart>
               </ResponsiveContainer>
+            </Box>
+          )}
+          {referrerData.length > 0 && (
+            <Box mb={2}>
+              <Typography variant="subtitle2">Top Referrers</Typography>
+              <TableContainer>
+                <Table size="small">
+                  <TableHead>
+                    <TableRow>
+                      <TableCell>Referrer</TableCell>
+                      <TableCell>Clicks</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {referrerData.map((row, idx) => (
+                      <TableRow key={idx}>
+                        <TableCell>{row.referrer}</TableCell>
+                        <TableCell>{row.count}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
             </Box>
           )}
           {fetchedClickLocation.length === 0 ? (
@@ -327,22 +354,21 @@ console.log('fetched country:',countryCounts)
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                {fetchedClickLocation.slice().reverse().map((loc: any, idx: number) => (
-            <TableRow key={idx}>
-              <TableCell>{loc.country || "Unknown"}</TableCell>
-              <TableCell>{loc.city || ""}</TableCell>
-              <TableCell>
-                {loc.timestamp
-                  ? new Date(
-                      loc.timestamp.seconds
-                        ? loc.timestamp.seconds * 1000
-                        : loc.timestamp
-                    ).toLocaleDateString()
-                  : ""}
-              </TableCell>
-            </TableRow>
-          ))}
-
+                  {fetchedClickLocation.slice().reverse().map((loc: any, idx: number) => (
+                    <TableRow key={idx}>
+                      <TableCell>{loc.country || "Unknown"}</TableCell>
+                      <TableCell>{loc.city || ""}</TableCell>
+                      <TableCell>
+                        {loc.timestamp
+                          ? new Date(
+                              loc.timestamp.seconds
+                                ? loc.timestamp.seconds * 1000
+                                : loc.timestamp
+                            ).toLocaleDateString()
+                          : ""}
+                      </TableCell>
+                    </TableRow>
+                  ))}
                 </TableBody>
               </Table>
             </TableContainer>

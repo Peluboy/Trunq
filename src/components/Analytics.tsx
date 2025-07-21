@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Box, Typography, Grid } from "@mui/material";
 import "../styles/account.css";
 import { AiOutlineLink } from "react-icons/ai";
-import { collection, getDocs } from "firebase/firestore";
+import { collection, getDocs, onSnapshot } from "firebase/firestore";
 import { firestore, auth } from "../utils/Firebase";
 import AdsClickIcon from "@mui/icons-material/AdsClick";
 import FmdGoodOutlinedIcon from "@mui/icons-material/FmdGoodOutlined";
@@ -17,36 +17,36 @@ const Analytics = ({ totalLinks }: AnalyticsProps) => {
   const [topLocation, setTopLocation] = useState("");
 
   useEffect(() => {
-    const fetchTotalClicksSum = async () => {
-      try {
-        const linksRef = collection(firestore, "links");
-        const linksSnapshot = await getDocs(linksRef);
-
-        const promises = linksSnapshot.docs.map(async (doc) => {
-          const { totalClicks, userID } = doc.data();
-          if (userID === auth.currentUser?.uid) {
-            const parsedClicks = parseInt(totalClicks);
-            return isNaN(parsedClicks) ? 0 : parsedClicks;
-          } else {
-            return 0;
+    const linksRef = collection(firestore, "links");
+    const unsubscribe = onSnapshot(linksRef, (linksSnapshot) => {
+      let sum = 0;
+      let allLocations: string[] = [];
+      linksSnapshot.docs.forEach((doc) => {
+        const { totalClicks, userID, clickLocation } = doc.data();
+        if (userID === auth.currentUser?.uid) {
+          const parsedClicks = parseInt(totalClicks);
+          sum += isNaN(parsedClicks) ? 0 : parsedClicks;
+          if (Array.isArray(clickLocation)) {
+            allLocations = allLocations.concat(
+              clickLocation.map((loc: any) => loc.country || "Unknown")
+            );
           }
-        });
-
-        const totalClicksArray = await Promise.all(promises);
-        const sum = totalClicksArray.reduce(
-          (accumulator, currentValue) => accumulator + currentValue,
-          0
-        );
-
-        setTotalClicksSum(sum);
-
-        setTopLocation(sum === 0 ? "No Data" : "Nigeria");
-      } catch (error) {
-        console.error("Error fetching total clicks:", error);
+        }
+      });
+      setTotalClicksSum(sum);
+      // Compute top location
+      if (allLocations.length === 0) {
+        setTopLocation("No Data");
+      } else {
+        const locationCounts = allLocations.reduce((acc: Record<string, number>, country: string) => {
+          acc[country] = (acc[country] || 0) + 1;
+          return acc;
+        }, {});
+        const top = Object.entries(locationCounts).sort((a, b) => b[1] - a[1])[0][0];
+        setTopLocation(top);
       }
-    };
-
-    fetchTotalClicksSum();
+    });
+    return () => unsubscribe();
   }, []);
 
   return (

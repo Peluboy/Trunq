@@ -73,8 +73,8 @@ module.exports = async (req, res) => {
               res.status(403).json({ error: 'Incorrect password' });
               return;
             }
-            // Geolocation tracking
-            let country = null, city = null;
+            // Geolocation and referrer tracking
+            let country = null, city = null, referrer = null;
             try {
               const ip = req.headers["x-forwarded-for"]?.split(",")[0] || req.connection.remoteAddress;
               console.log("IP for geolocation:", ip);
@@ -84,9 +84,10 @@ module.exports = async (req, res) => {
               country = geo.country || null;
               city = geo.city || null;
             } catch {}
+            referrer = req.headers["referer"] || null;
             await db.collection("links").doc(shortCode).update({
               totalClicks: totalClicks + 1,
-              clickLocation: admin.firestore.FieldValue.arrayUnion({ country, city, timestamp: new Date() })
+              clickLocation: admin.firestore.FieldValue.arrayUnion({ country, city, referrer, timestamp: new Date() })
             });
             res.writeHead(301, { Location: longURL });
             res.end();
@@ -97,8 +98,8 @@ module.exports = async (req, res) => {
         return;
       }
     } else {
-      // Geolocation tracking
-      let country = null, city = null;
+      // Geolocation and referrer tracking
+      let country = null, city = null, referrer = null;
       try {
         const ip = req.headers["x-forwarded-for"]?.split(",")[0] || req.connection.remoteAddress;
         console.log("IP for geolocation:", ip);
@@ -108,9 +109,10 @@ module.exports = async (req, res) => {
         country = geo.country || null;
         city = geo.city || null;
       } catch {}
+      referrer = req.headers["referer"] || null;
       await db.collection("links").doc(shortCode).update({
         totalClicks: totalClicks + 1,
-        clickLocation: admin.firestore.FieldValue.arrayUnion({ country, city, timestamp: new Date() })
+        clickLocation: admin.firestore.FieldValue.arrayUnion({ country, city, referrer, timestamp: new Date() })
       });
       console.log("Redirecting to:", longURL);
       res.writeHead(301, { Location: longURL });
