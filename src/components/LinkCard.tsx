@@ -140,7 +140,7 @@ const LinkCard = ({
 
     fetchLinkTotalClicks();
   }, [shortCode]);
-
+  console.log(clickLocation)
   useEffect(() => {
     const fetchTopLocation = async () => {
       const locationQuery = query(
@@ -229,22 +229,6 @@ const LinkCard = ({
         </Box>
       </Box>
       <Box display="flex" alignItems="center">
-        <Typography variant="body2" fontSize={isMobile ? "16px" : "20px"}>
-          {displayTotalClicks !== null ? displayTotalClicks : ""}
-        </Typography>{" "}
-        <Tooltip
-          title={
-            displayTotalClicks !== null
-              ? `Top Location: ${displayTotalClicks > 0 ? topLocation : ""}`
-              : ""
-          }
-          arrow
-          placement="top"
-        >
-          <IconButton sx={{ marginRight: isMobile ? "-10px" : "-8px" }}>
-            <SignalCellularAltIcon fontSize="small" color="success" />
-          </IconButton>
-        </Tooltip>
         <Tooltip title="Copy" arrow placement="top">
           <IconButton
             onClick={() => copyLink(shortUrl)}
@@ -259,7 +243,7 @@ const LinkCard = ({
           </IconButton>
         </Tooltip>
         <Tooltip title="View Analytics" arrow placement="top">
-          <IconButton onClick={handleAnalyticsOpen} sx={{ ml: 1 }}>
+          <IconButton onClick={handleAnalyticsOpen}>
             <BarChartIcon fontSize="small" color="primary" />
           </IconButton>
         </Tooltip>
@@ -289,7 +273,9 @@ const LinkCard = ({
         <DialogTitle>Click Analytics</DialogTitle>
         <DialogContent>
           <Box mb={2}>
-            <Typography variant="subtitle2">Total Clicks: {totalClicks}</Typography>
+          <Typography variant="subtitle2">
+  Total Clicks: {typeof displayTotalClicks === 'number' ? displayTotalClicks : 0}
+</Typography>
             <Typography variant="subtitle2">Unique Countries: {uniqueCountries.length}</Typography>
           </Box>
           {chartData.length > 0 && (
@@ -304,30 +290,38 @@ const LinkCard = ({
               </ResponsiveContainer>
             </Box>
           )}
-          {clickLocation.length === 0 ? (
-            <Typography variant="body2">No click data yet.</Typography>
-          ) : (
-            <TableContainer component={Paper}>
-              <Table size="small">
-                <TableHead>
-                  <TableRow>
-                    <TableCell>Country</TableCell>
-                    <TableCell>City</TableCell>
-                    <TableCell>Timestamp</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {clickLocation.slice().reverse().map((loc: any, idx: number) => (
-                    <TableRow key={idx}>
-                      <TableCell>{loc.country || "Unknown"}</TableCell>
-                      <TableCell>{loc.city || ""}</TableCell>
-                      <TableCell>{loc.timestamp ? new Date(loc.timestamp.seconds ? loc.timestamp.seconds * 1000 : loc.timestamp).toLocaleString() : ""}</TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
-          )}
+{clickLocation.length === 0 ? (
+  <Typography variant="body2">No click data yet.</Typography>
+) : (
+  <TableContainer component={Paper}>
+    <Table size="small">
+      <TableHead>
+        <TableRow>
+          <TableCell>Country</TableCell>
+          <TableCell>City</TableCell>
+          <TableCell>Timestamp</TableCell>
+        </TableRow>
+      </TableHead>
+      <TableBody>
+        {clickLocation.slice().reverse().map((loc: any, idx: number) => (
+          <TableRow key={idx}>
+            <TableCell>{loc.country || "Unknown"}</TableCell>
+            <TableCell>{loc.city || ""}</TableCell>
+            <TableCell>
+              {loc.timestamp
+                ? new Date(
+                    loc.timestamp.seconds
+                      ? loc.timestamp.seconds * 1000
+                      : loc.timestamp
+                  ).toLocaleString()
+                : ""}
+            </TableCell>
+          </TableRow>
+        ))}
+      </TableBody>
+    </Table>
+  </TableContainer>
+)}
         </DialogContent>
         <DialogActions>
           <Button onClick={handleAnalyticsClose}>Close</Button>
