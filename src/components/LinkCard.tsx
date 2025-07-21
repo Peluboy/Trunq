@@ -8,10 +8,24 @@ import {
   useMediaQuery,
   Tooltip,
   IconButton,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  TextField,
+  Button,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import SignalCellularAltIcon from "@mui/icons-material/SignalCellularAlt";
+import BarChartIcon from '@mui/icons-material/BarChart';
 import {
   getDocs,
   getDoc,
@@ -20,9 +34,12 @@ import {
   query,
   orderBy,
   limit,
+  updateDoc,
 } from "firebase/firestore";
 import { firestore } from "../utils/Firebase";
 import { LinkCardProps } from "../types/types";
+import { auth } from "../utils/Firebase";
+import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, Tooltip as RechartsTooltip } from "recharts";
 
 const LinkCard = ({
   id,
@@ -32,6 +49,8 @@ const LinkCard = ({
   deleteLink,
   copyLink,
   customURL,
+  expiresAt,
+  clickLocation = [],
 }: LinkCardProps) => {
   const [createdAt, setCreatedAt] = useState<Date | null>(null);
   const [ , setLinkTotalClicks] = useState<number | null>(null);
@@ -41,9 +60,45 @@ const LinkCard = ({
     null
   );
   const [longUrlPreview, ] = useState(null);
+  const [editOpen, setEditOpen] = useState(false);
+  const [editUrl, setEditUrl] = useState(longURL);
+  const [editLoading, setEditLoading] = useState(false);
+  const [editError, setEditError] = useState("");
+  const [analyticsOpen, setAnalyticsOpen] = useState(false);
+  const handleAnalyticsOpen = () => setAnalyticsOpen(true);
+  const handleAnalyticsClose = () => setAnalyticsOpen(false);
 
   const handleDeleteLink = async () => {
     await deleteLink(id);
+  };
+
+  const handleEdit = () => setEditOpen(true);
+  const handleEditClose = () => {
+    setEditOpen(false);
+    setEditError("");
+    setEditUrl(longURL);
+  };
+  const handleEditSubmit = async () => {
+    if (!editUrl.trim()) {
+      setEditError("URL cannot be empty");
+      return;
+    }
+    setEditLoading(true);
+    try {
+      // Update in Firestore (both user and global)
+      const userUid = auth.currentUser?.uid;
+      if (userUid) {
+        const userLinkRef = doc(firestore, `users/${userUid}/links`, id);
+        await updateDoc(userLinkRef, { longURL: editUrl });
+      }
+      const globalLinkRef = doc(firestore, "links", shortCode);
+      await updateDoc(globalLinkRef, { longURL: editUrl });
+      setEditOpen(false);
+    } catch (err) {
+      setEditError("Failed to update link");
+    } finally {
+      setEditLoading(false);
+    }
   };
 
   const shortUrl = customURL
@@ -107,6 +162,16 @@ const LinkCard = ({
     fetchTopLocation();
   }, []);
 
+  // Analytics summary and chart data
+  const totalClicks = clickLocation.length;
+  const countryCounts = clickLocation.reduce((acc: Record<string, number>, loc: any) => {
+    const country = loc.country || 'Unknown';
+    acc[country] = (acc[country] || 0) + 1;
+    return acc;
+  }, {});
+  const uniqueCountries = Object.keys(countryCounts);
+  const chartData = uniqueCountries.map(country => ({ country, clicks: countryCounts[country] }));
+
   return (
     <Box
       display="flex"
@@ -155,6 +220,13 @@ const LinkCard = ({
             </Tooltip>
           )}
         </Box>
+        <Box mt=".5rem">
+        {expiresAt && (
+          <Typography variant="caption" color="textSecondary">
+            Expires: {isValid(new Date(expiresAt)) ? format(new Date(expiresAt), "d MMM yyyy, HH:mm") : "-"}
+          </Typography>
+        )}
+        </Box>
       </Box>
       <Box display="flex" alignItems="center">
         <Typography variant="body2" fontSize={isMobile ? "16px" : "20px"}>
@@ -186,7 +258,81 @@ const LinkCard = ({
             <DeleteIcon fontSize="small" color="success" />
           </IconButton>
         </Tooltip>
+        <Tooltip title="View Analytics" arrow placement="top">
+          <IconButton onClick={handleAnalyticsOpen} sx={{ ml: 1 }}>
+            <BarChartIcon fontSize="small" color="primary" />
+          </IconButton>
+        </Tooltip>
+        <Button size="small" variant="outlined" onClick={handleEdit} sx={{ ml: 1 }}>
+          Edit
+        </Button>
       </Box>
+      <Dialog open={editOpen} onClose={handleEditClose} fullWidth>
+        <DialogTitle style={{ textTransform: 'none' }}>Edit Link</DialogTitle>
+        <DialogContent>
+          <TextField
+            label="Long URL"
+            value={editUrl}
+            onChange={e => setEditUrl(e.target.value)}
+            fullWidth
+       error={!!editError}
+            helperText={editError}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleEditClose} disabled={editLoading}>Cancel</Button>
+          <Button onClick={handleEditSubmit} variant="contained" disabled={editLoading}>Save</Button>
+        </DialogActions>
+      </Dialog>
+      {/* Analytics Modal */}
+      <Dialog open={analyticsOpen} onClose={handleAnalyticsClose} fullWidth maxWidth="sm">
+        <DialogTitle>Click Analytics</DialogTitle>
+        <DialogContent>
+          <Box mb={2}>
+            <Typography variant="subtitle2">Total Clicks: {totalClicks}</Typography>
+            <Typography variant="subtitle2">Unique Countries: {uniqueCountries.length}</Typography>
+          </Box>
+          {chartData.length > 0 && (
+            <Box mb={2} height={200}>
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={chartData} layout="vertical">
+                  <XAxis type="number" allowDecimals={false} />
+                  <YAxis dataKey="country" type="category" width={100} />
+                  <RechartsTooltip />
+                  <Bar dataKey="clicks" fill="#1976d2" />
+                </BarChart>
+              </ResponsiveContainer>
+            </Box>
+          )}
+          {clickLocation.length === 0 ? (
+            <Typography variant="body2">No click data yet.</Typography>
+          ) : (
+            <TableContainer component={Paper}>
+              <Table size="small">
+                <TableHead>
+                  <TableRow>
+                    <TableCell>Country</TableCell>
+                    <TableCell>City</TableCell>
+                    <TableCell>Timestamp</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {clickLocation.slice().reverse().map((loc: any, idx: number) => (
+                    <TableRow key={idx}>
+                      <TableCell>{loc.country || "Unknown"}</TableCell>
+                      <TableCell>{loc.city || ""}</TableCell>
+                      <TableCell>{loc.timestamp ? new Date(loc.timestamp.seconds ? loc.timestamp.seconds * 1000 : loc.timestamp).toLocaleString() : ""}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleAnalyticsClose}>Close</Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 };

@@ -1,4 +1,6 @@
 const admin = require('firebase-admin');
+const crypto = require('crypto');
+const fetch = require('node-fetch');
 
 if (!admin.apps.length) {
   if (process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON) {
@@ -43,13 +45,77 @@ module.exports = async (req, res) => {
       res.status(404).json({ error: "Link not found" });
       return;
     }
-    const { longURL, totalClicks = 0 } = linkDoc.data();
-    await db.collection("links").doc(shortCode).update({
-      totalClicks: totalClicks + 1,
-    });
-    console.log("Redirecting to:", longURL);
-    res.writeHead(301, { Location: longURL });
-    res.end();
+    const { longURL, totalClicks = 0, expiresAt, passwordHash } = linkDoc.data();
+    // Check expiration
+    if (expiresAt) {
+      const now = new Date();
+      const expDate = expiresAt._seconds ? new Date(expiresAt._seconds * 1000) : new Date(expiresAt);
+      if (now > expDate) {
+        res.statusCode = 410;
+        res.setHeader('Content-Type', 'application/json');
+        res.end(JSON.stringify({ error: 'Link expired' }));
+        return;
+      }
+    }
+    // Password protection
+    if (passwordHash) {
+      if (req.method === 'GET') {
+        res.status(401).json({ passwordRequired: true });
+        return;
+      } else if (req.method === 'POST') {
+        let body = '';
+        req.on('data', chunk => { body += chunk; });
+        req.on('end', async () => {
+          try {
+            const { password } = JSON.parse(body);
+            const hash = crypto.createHash('sha256').update(password).digest('hex');
+            if (hash !== passwordHash) {
+              res.status(403).json({ error: 'Incorrect password' });
+              return;
+            }
+            // Geolocation tracking
+            let country = null, city = null;
+            try {
+              const ip = req.headers["x-forwarded-for"]?.split(",")[0] || req.connection.remoteAddress;
+              console.log("IP for geolocation:", ip);
+              const geoRes = await fetch(`http://ip-api.com/json/${ip}`);
+              const geo = await geoRes.json();
+              console.log("Geo response:", geo);
+              country = geo.country || null;
+              city = geo.city || null;
+            } catch {}
+            await db.collection("links").doc(shortCode).update({
+              totalClicks: totalClicks + 1,
+              clickLocation: admin.firestore.FieldValue.arrayUnion({ country, city, timestamp: new Date() })
+            });
+            res.writeHead(301, { Location: longURL });
+            res.end();
+          } catch (err) {
+            res.status(400).json({ error: 'Invalid request' });
+          }
+        });
+        return;
+      }
+    } else {
+      // Geolocation tracking
+      let country = null, city = null;
+      try {
+        const ip = req.headers["x-forwarded-for"]?.split(",")[0] || req.connection.remoteAddress;
+        console.log("IP for geolocation:", ip);
+        const geoRes = await fetch(`http://ip-api.com/json/${ip}`);
+        const geo = await geoRes.json();
+        console.log("Geo response:", geo);
+        country = geo.country || null;
+        city = geo.city || null;
+      } catch {}
+      await db.collection("links").doc(shortCode).update({
+        totalClicks: totalClicks + 1,
+        clickLocation: admin.firestore.FieldValue.arrayUnion({ country, city, timestamp: new Date() })
+      });
+      console.log("Redirecting to:", longURL);
+      res.writeHead(301, { Location: longURL });
+      res.end();
+    }
   } catch (error) {
     console.error("Redirect error:", error);
     res.status(500).json({ error: "Internal server error" });

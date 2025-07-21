@@ -13,6 +13,7 @@ import { collection, addDoc, setDoc, doc } from "firebase/firestore";
 import TabPanel from "./TabPanel";
 import TabsComponent from "./TabsComponent";
 import { LinkCardProps } from "../types/types";
+import crypto from "crypto-js";
 
 const TopBar: React.FC<{ updateStats: (clicks: number, links: number) => void }> = ({ updateStats }) => {
   const [openModal, setOpenModal] = useState(false);
@@ -26,10 +27,15 @@ const TopBar: React.FC<{ updateStats: (clicks: number, links: number) => void }>
     setValue(newValue);
   };
 
-  const handleCreateShortenLink = async (name: string, longURL: string, customURL: string) => {
-    const isValidURL = /^(ftp|http|https):\/\/[^ "]+$/.test(longURL);
+  const handleCreateShortenLink = async (name: string, longURL: string, customURL: string, expiresAt?: string, password?: string) => {
+    const isValidURL = /^(ftp|http|https):\/\/[^ "']+$/.test(longURL);
     if (!isValidURL) {
       longURL = `http://${longURL}`;
+    }
+
+    let passwordHash = null;
+    if (password) {
+      passwordHash = crypto.SHA256(password).toString();
     }
 
     const link = {
@@ -41,6 +47,8 @@ const TopBar: React.FC<{ updateStats: (clicks: number, links: number) => void }>
       description: "",
       clickLocation: [],
       userID: auth.currentUser?.uid,
+      expiresAt: expiresAt ? new Date(expiresAt) : null,
+      passwordHash,
     };
 
     const linksPathRef = collection(firestore, `users/${link.userID}/links`);
@@ -54,6 +62,8 @@ const TopBar: React.FC<{ updateStats: (clicks: number, links: number) => void }>
       longURL: link.longURL,
       userID: link.userID,
       shortCode: link.shortCode,
+      expiresAt: link.expiresAt,
+      passwordHash,
     });
 
     const newLink: LinkCardProps = {

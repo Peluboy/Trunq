@@ -4,12 +4,13 @@ import Home from "../pages/Home/Home";
 import Account from "../pages/Accounts";
 import { auth } from "../utils/Firebase";
 import { Box, CircularProgress } from "@mui/material";
-import ForgetPassword from "../pages/ForgetPassowrd";
 import ResetPassword from "../pages/ResetPassword";
 import ErrorPage from "../pages/ErrorPage";
-import Redirect from "../components/Redirect";
+// import Redirect from "../components/Redirect";
 import PrivacyPolicy from "../pages/PrivacyPolicy";
 import Layout from "../layout/Layout";
+import ForgetPassword from "../pages/ForgetPassowrd";
+import LinkExpired from "../pages/LinkExpired";
 
 const LayoutRoutes = () => (
   <Layout>
@@ -19,6 +20,7 @@ const LayoutRoutes = () => (
       <Route path="/forgot-password" element={<ForgetPassword />} />
       <Route path="/privacy-policy" element={<PrivacyPolicy />} />
       <Route path="/reset-password" element={<ResetPassword />} />
+      <Route path="/expired" element={<LinkExpired />} />
       <Route path="*" element={<ErrorPage />} />
     </Routes>
   </Layout>
@@ -49,7 +51,7 @@ const Routers = () => {
       <Route path="/" element={<Navigate to="/home" />} />
       <Route path="/home" element={user ? <Navigate to="/dashboard" /> : <Home />} />
       <Route path="/dashboard" element={user ? <Account /> : <Navigate to="/home" />} />
-      {/* <Route path="/:shortCode" element={<Redirect />} /> */}
+      {/* <Route path=":shortCode" element={<Redirect />} /> */}
       <Route path="*" element={<LayoutRoutes />} />
     </Routes>
   );

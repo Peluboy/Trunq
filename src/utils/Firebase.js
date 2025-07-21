@@ -17,7 +17,7 @@ const firebaseConfig = {
   appId: process.env.REACT_APP_APP_ID,
   measurementId: process.env.REACT_APP_MEASUREMENT_ID,
 };
-console.log("FIREBASE CONFIG:", firebaseConfig);
+
 if (Object.values(firebaseConfig).some((value) => !value)) {
   throw new Error("Firebase config is missing environment variables");
 }

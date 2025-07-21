@@ -1,68 +1,87 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
-import { firestore } from "../utils/Firebase";
-import { doc, getDoc, updateDoc, increment } from "firebase/firestore";
+import { useParams, useNavigate } from "react-router-dom";
+import PasswordPrompt from "./PasswordPrompt";
 
 const Redirect = () => {
   const { shortCode } = useParams();
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
+  const [passwordRequired, setPasswordRequired] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [apiUrl, setApiUrl] = useState("");
+  const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchAndRedirect = async () => {
-      try {
-        const linkDoc = await getDoc(doc(firestore, "links", shortCode || ""));
-
-        if (!linkDoc.exists()) {
-          setError(true);
-          return;
+    if (!shortCode) return;
+    const url = `/api/redirect.js?shortCode=${shortCode}`;
+    setApiUrl(url);
+    fetch(url)
+      .then(async (res) => {
+        if (res.status === 401) {
+          setPasswordRequired(true);
+          setLoading(false);
+        } else if (res.status === 301 || res.redirected) {
+          window.location.href = res.url;
+        } else if (res.status === 410) {
+          navigate("/expired");
+        } else if (!res.ok) {
+          setError("Link not found");
+          setLoading(false);
+        } else {
+          // fallback: try to redirect
+          const data = await res.json();
+          if (data && data.longURL) {
+            window.location.href = data.longURL;
+          } else {
+            setError("Link not found");
+            setLoading(false);
+          }
         }
+      })
+      .catch(() => {
+        setError("Link not found");
+        setLoading(false);
+      });
+  }, [shortCode, navigate]);
 
-        const { longURL } = linkDoc.data();
-        
-        // Update click count
-        await updateDoc(doc(firestore, "links", shortCode || ""), {
-          totalClicks: increment(1)
-        });
-
-        // Set meta refresh for immediate redirect
-        const meta = document.createElement("meta");
-        meta.httpEquiv = "refresh";
-        meta.content = `0;url=${longURL}`;
-        document.head.appendChild(meta);
-
-        // Fallback redirect
-        window.location.href = longURL;
-      } catch (err) {
-        console.error("Redirect error:", err);
-        setError(true);
-      } finally {
+  const handlePasswordSubmit = async (password: string) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await fetch(apiUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ password }),
+      });
+      if (res.status === 301 || res.redirected) {
+        window.location.href = res.url;
+      } else if (res.status === 403) {
+        setError("Incorrect password");
+        setLoading(false);
+      } else if (res.status === 410) {
+        navigate("/expired");
+      } else {
+        setError("Something went wrong");
         setLoading(false);
       }
-    };
+    } catch {
+      setError("Network error");
+      setLoading(false);
+    }
+  };
 
-    fetchAndRedirect();
-  }, [shortCode]);
-
-  if (error) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-100">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-800">Link Not Found</h1>
-          <p className="mt-2 text-gray-600">The requested link does not exist.</p>
-        </div>
-      </div>
-    );
+  if (loading) {
+    return <div>Loading...</div>;
   }
 
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="text-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto"></div>
-        <p className="mt-4 text-gray-600">Redirecting...</p>
-      </div>
-    </div>
-  );
+  if (passwordRequired) {
+    return <PasswordPrompt onSubmit={handlePasswordSubmit} loading={loading} error={error || undefined} />;
+  }
+
+  if (error) {
+    return <div>{error}</div>;
+  }
+
+  return null;
 };
 
 export default Redirect;

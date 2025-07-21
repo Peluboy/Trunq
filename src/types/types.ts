@@ -10,6 +10,7 @@ export interface LinkCardProps {
     deleteLink: (linkDocID: string) => Promise<void>;
     copyLink: (shortUrl: string) => void;
     customURL?: string;
+    expiresAt?: Date | null;
   }
   
   export interface Link extends LinkCardProps {

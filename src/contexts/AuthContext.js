@@ -35,10 +35,6 @@ export default function AuthContextProvider({ children }) {
     };
   }, []);
 
-  useEffect(() => {
-    console.log("The user is", currentUser);
-  }, [currentUser]);
-
   async function handleGoogleSignIn() {
     try {
       const result = await signInWithPopup(auth, provider);

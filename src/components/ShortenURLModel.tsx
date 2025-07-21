@@ -20,7 +20,7 @@ export interface ShortenURLModalProps {
     event: React.MouseEvent<SVGElement>,
     reason: "backdropClick" | "escapeKeyDown"
   ) => void;
-  createShortenLink: (name: string, longUrl: string, customUrl: string) => void;
+  createShortenLink: (name: string, longUrl: string, customUrl: string, expiresAt?: string, password?: string) => void;
   customUrl: string;
   setCustomUrl: React.Dispatch<React.SetStateAction<string>>;
 }
@@ -37,9 +37,12 @@ const ShortenURLModal = ({
     customUrl: "",
   });
 
+  const [expiresAt, setExpiresAt] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
   const [errors, setErrors] = useState({
     name: "",
     longUrl: "",
+    password: "",
   });
 
   const [loading, setLoading] = useState(false);
@@ -49,19 +52,19 @@ const ShortenURLModal = ({
       [event.target.name]: event.target.value,
     }));
 
-  const handleCustomUrlChange = (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    const lowercaseCustomUrl = event.target.value.toLowerCase();
-    setCustomUrl(lowercaseCustomUrl);
-    setForm((oldForm) => ({
-      ...oldForm,
-      customUrl: lowercaseCustomUrl,
-    }));
-  };
+  // const handleCustomUrlChange = (
+  //   event: React.ChangeEvent<HTMLInputElement>
+  // ) => {
+  //   const lowercaseCustomUrl = event.target.value.toLowerCase();
+  //   setCustomUrl(lowercaseCustomUrl);
+  //   setForm((oldForm) => ({
+  //     ...oldForm,
+  //     customUrl: lowercaseCustomUrl,
+  //   }));
+  // };
 
   const handleSubmit = async () => {
-    const errors = {} as { name: string; longUrl: string };
+    const errors = { name: "", longUrl: "", password: "" };
 
     const tName = form.name.trim();
     const tLongUrl = form.longUrl.trim();
@@ -77,15 +80,18 @@ const ShortenURLModal = ({
       errors.longUrl = "URL is invalid";
     }
 
-    if (Object.keys(errors).length > 0) {
+    if (password && password.length < 4) {
+      errors.password = "Password should be at least 4 characters";
+    }
+
+    if (errors.name || errors.longUrl || errors.password) {
       return setErrors(errors);
     }
     setLoading(true);
     try {
-      setTimeout(
-        () => createShortenLink(tName, tLongUrl, form.customUrl),
-        1000
-      );
+      setTimeout(() => {
+        createShortenLink(tName, tLongUrl, form.customUrl, expiresAt, password);
+      }, 1000);
     } catch (error) {
       setLoading(false);
     }
@@ -148,7 +154,7 @@ const ShortenURLModal = ({
               placeholder="https://webinar.online/example?:hgbe123pp"
             />
           </Box>
-          <Box display="flex" flexDirection="column">
+          {/* <Box display="flex" flexDirection="column">
             <Typography variant="overline">Your Custom URL</Typography>
             <Box display="flex" alignItems="stretch" gap={0.5}>
               <Button
@@ -160,10 +166,11 @@ const ShortenURLModal = ({
                 <Typography variant="h6">trunq.xyz/</Typography>
               </Button>
               <TextField
-                value={customUrl}
+                // value={customUrl}
+                value="Coming Soon!!"
                 size="small"
                 name="customUrl"
-                onChange={handleCustomUrlChange}
+                // onChange={handleCustomUrlChange}
                 type="text"
                 placeholder="e.g kolohub (optional)"
                 sx={{
@@ -172,7 +179,29 @@ const ShortenURLModal = ({
                 }}
               />
             </Box>
+          </Box> */}
+          <Box display="flex" flexDirection="column" mt={2}>
+            <Typography variant="overline">Expiration Date (optional)</Typography>
+            <TextField
+              type="datetime-local"
+              size="small"
+              value={expiresAt}
+              onChange={(e) => setExpiresAt(e.target.value)}
+              InputLabelProps={{ shrink: true }}
+            />
           </Box>
+          {/* <Box display="flex" flexDirection="column" mt={2}>
+            <Typography variant="overline">Password Protect (optional)</Typography>
+            <TextField
+              type="password"
+              size="small"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              error={!!errors.password}
+              helperText={errors.password}
+              placeholder="Enter password to protect link"
+            />
+          </Box> */}
         </Box>
       </DialogContent>
       <DialogActions>

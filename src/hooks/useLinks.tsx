@@ -34,7 +34,10 @@ export const useLinks = (updateStats: (clicks: number, links: number) => void) =
           deleteLink: handleDeleteLink,
           description: data.description || "",
           customURL: data.customURL || "",
-          clickLocation: data.clickLocation || [],
+          clickLocation: Array.isArray(data.clickLocation) ? data.clickLocation : [],
+          expiresAt: data.expiresAt
+            ? (data.expiresAt.toDate ? data.expiresAt.toDate() : new Date(data.expiresAt))
+            : null,
         };
 
         tempLinks.push(link);
