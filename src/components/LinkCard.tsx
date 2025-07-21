@@ -34,6 +34,8 @@ import {
   orderBy,
   limit,
   updateDoc,
+  onSnapshot,
+  doc as firestoreDoc,
 } from "firebase/firestore";
 import { firestore } from "../utils/Firebase";
 import { LinkCardProps } from "../types/types";
@@ -163,24 +165,18 @@ const LinkCard = ({
   }, []);
 
   useEffect(() => {
-    const fetchClickLocation = async () => {
-      try {
-        const linkDocRef = doc(firestore, "links", shortCode);
-        const linkDocSnapshot = await getDoc(linkDocRef);
-        if (linkDocSnapshot.exists()) {
-          const data = linkDocSnapshot.data();
-          if (data.clickLocation && Array.isArray(data.clickLocation)) {
-            setFetchedClickLocation(data.clickLocation);
-          } else {
-            setFetchedClickLocation([]);
-          }
+    const linkDocRef = firestoreDoc(firestore, "links", shortCode);
+    const unsubscribe = onSnapshot(linkDocRef, (linkDocSnapshot) => {
+      if (linkDocSnapshot.exists()) {
+        const data = linkDocSnapshot.data();
+        if (data.clickLocation && Array.isArray(data.clickLocation)) {
+          setFetchedClickLocation(data.clickLocation);
+        } else {
+          setFetchedClickLocation([]);
         }
-      } catch (error) {
-        console.error("Error fetching click location:", error);
       }
-    };
-  
-    fetchClickLocation();
+    });
+    return () => unsubscribe();
   }, [shortCode]);
   
 
@@ -203,6 +199,7 @@ const LinkCard = ({
   const referrerData = Object.entries(referrerCounts)
     .map(([referrer, count]) => ({ referrer, count }))
     .sort((a, b) => b.count - a.count);
+
   return (
     <Box
       display="flex"
@@ -318,7 +315,7 @@ const LinkCard = ({
               </ResponsiveContainer>
             </Box>
           )}
-          {referrerData.length > 0 && (
+          {/* {referrerData.length > 0 && (
             <Box mb={2}>
               <Typography variant="subtitle2">Top Referrers</Typography>
               <TableContainer>
@@ -340,7 +337,7 @@ const LinkCard = ({
                 </Table>
               </TableContainer>
             </Box>
-          )}
+          )} */}
           {fetchedClickLocation.length === 0 ? (
             <Typography variant="body2">No click data yet.</Typography>
           ) : (
